@@ -6,12 +6,43 @@ import session from 'express-session';
 import bcrypt from "bcrypt"
 import dotenv from 'dotenv';
 dotenv.config();
-
+import { RateLimiterRedis } from 'rate-limiter-flexible';
+import Redis from 'ioredis';
 
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+
+const redisClient = new Redis({
+    host: "127.0.0.1",
+    port: 6379
+});
+
+redisClient.on('connect', () => console.log('Connected to Redis!'));
+redisClient.on('error', (err) => console.error('Redis connection error:', err));
+
+redisClient.on('error', err => console.error('Redis error:', err));
+
+const rateLimiter = new RateLimiterRedis({
+    storeClient: redisClient,
+    keyPrefix: 'middleware',
+    points: 100,
+    duration: 60,
+    blockDuration: 300,
+});
+
+app.use(async (req, res, next) => {
+    try {
+        await rateLimiter.consume(req.ip); // Consume 1 point per request per IP
+        next();
+    } catch (err) {
+        return res.status(429).json({ error: 'Too many requests' });
+    }
+})
+
+
 
 
 app.use(express.json());
