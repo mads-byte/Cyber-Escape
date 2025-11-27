@@ -6,16 +6,54 @@ import session from 'express-session';
 import bcrypt from "bcrypt"
 import dotenv from 'dotenv';
 dotenv.config();
-
+import { RateLimiterRedis } from 'rate-limiter-flexible';
+import Redis from 'ioredis';
+import RedisStore from "connect-redis";
 
 
 
 const app = express();
+app.set('trust proxy', true); // allows express to see the real client IP when behind a proxy in production (EC2 instance)
 const PORT = process.env.PORT || 3000;
 
-
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+
+const redisClient = new Redis({ //host Redis
+    host: "127.0.0.1",
+    port: 6379
+});
+
+redisClient.on('connect', () => console.log('Connected to Redis!'));
+redisClient.on('error', (err) => console.error('Redis connection error:', err));
+
+
+
+const loginLimiter = new RateLimiterRedis({ // use redis to store login attempts and limit them
+    storeClient: redisClient,
+    keyPrefix: 'login',
+    points: 10,          // 10 attempts
+    duration: 15 * 60,  // per 15 minutes
+    blockDuration: 15 * 60, // block for 15 minutes if exceeded  
+});
+
+
+
+app.use(
+    session({
+        store: new RedisStore({ client: redisClient }), // use redis to store sessions instead of memory
+        secret: process.env.SESSION_SECRET,
+        resave: false, // don't save session if unmodified
+        saveUninitialized: false, // don't create session until something stored
+        cookie: {
+            httpOnly: true, // prevent client side from reading the cookie
+            secure: process.env.NODE_ENV === 'production', // set true in production but frontend must be https
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 1000 * 60 * 60 * 2, // expires after 2 hours
+        },
+    })
+);
+
 
 // To generate random team codes
 function generateCode() {
@@ -49,7 +87,7 @@ app.post('/register-user', async (req, res) => {
             'SELECT id FROM admins WHERE team_code = ?',
             [teamCode]
         );
-        if (teamAdmin.length == 0) {
+        if (teamAdmin.length == 0) { //check if team code exists
             return res
                 .status(409)
                 .json({ error: 'No existing teams with this code, try again!' });
@@ -59,7 +97,7 @@ app.post('/register-user', async (req, res) => {
             'SELECT id FROM users WHERE username = ? AND team_code = ?',
             [username, teamCode]
         );
-        if (existingTeammate.length > 0) {
+        if (existingTeammate.length > 0) { // check if username already taken in this team
             return res
                 .status(409)
                 .json({ error: 'One of your teammates already has this username!' });
@@ -122,30 +160,52 @@ app.post('/register-admin', async (req, res) => {
     }
 });
 
-app.post('/user-login', async (req, res) => {
+app.post('/user-login', async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        await loginLimiter.consume(req.ip);
+        next();
+    } catch (err) {
+        return res.status(429).json({
+            error: "Too many login attempts. Please wait 15 minutes."
+        });
+    }
+}, async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-        if (!username || !password) {
-            return res.status(400).json({ error: 'username and password are required' });
+        if (!email || !password) {
+            return res.status(400).json({ error: 'email and password are required' });
         }
 
         const [user] = await db.query(
-            'SELECT * FROM users WHERE username = ?',
-            [username]
+            'SELECT * FROM users WHERE email = ?',
+            [email]
         );
 
         if (user.length === 0) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
         const valid = await bcrypt.compare(password, user[0].password);
 
         if (!valid) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        res.status(200).json({ message: 'Login successful', user: user[0] });
+        // Login successful → reset limiter for this IP
+        await loginLimiter.delete(req.ip);
+
+        req.session.admin = null;
+        req.session.user = {
+            id: user[0].id,
+            account_type: 'user',
+            username: user[0].username,
+            email: user[0].email,
+            experience_points: user[0].experience_points,
+            team_code: user[0].team_code
+        };
+
+        return res.json({ message: "Login successful", user: req.session.user });
 
     } catch (error) {
         console.error('Error during user login:', error);
@@ -153,30 +213,50 @@ app.post('/user-login', async (req, res) => {
     }
 });
 
-app.post('/admin-login', async (req, res) => {
+app.post('/admin-login', async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        await loginLimiter.consume(req.ip);
+        next();
+    } catch {
+        return res.status(429).json({
+            error: "Too many login attempts. Try again later."
+        });
+    }
+}, async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-        if (!username || !password) {
-            return res.status(400).json({ error: 'username and password are required' });
+        if (!email || !password) {
+            return res.status(400).json({ error: 'email and password are required' });
         }
 
         const [admin] = await db.query(
-            'SELECT * FROM admins WHERE username = ?',
-            [username]
+            'SELECT * FROM admins WHERE email = ?',
+            [email]
         );
 
         if (admin.length === 0) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
         const valid = await bcrypt.compare(password, admin[0].password);
 
         if (!valid) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        res.status(200).json({ message: 'Login successful', admin: admin[0] });
+        await loginLimiter.delete(req.ip);
+
+        req.session.user = null;
+        req.session.admin = {
+            id: admin[0].id,
+            account_type: 'admin',
+            username: admin[0].username,
+            email: admin[0].email,
+            team_code: admin[0].team_code
+        };
+
+        return res.json({ message: "Login successful", admin: req.session.admin });
 
     } catch (error) {
         console.error('Error during admin login:', error);
