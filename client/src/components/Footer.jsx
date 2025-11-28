@@ -1,12 +1,103 @@
-import { NavLink } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import "../styles/Footer.css";
+import fbIcon from '../assets/facebook-50.png';
+import iIcon from '../assets/instagram.png';
+import TIcon from '../assets/icons8-twitter-logo-50.png';
 
 function Footer() {
+    const [email, setEmail] = useState("");
+    const [message, setMessage] = useState("");
+    const [isValid, setIsValid] = useState(null);
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!email) {
+            setMessage('Please enter your email');
+            setIsValid(false);
+            return;
+        }
+
+        if (!emailRegex.test(email)) {
+            setMessage('Please enter a valid email address.');
+            setIsValid(false);
+        } else {
+            setMessage('Success! You are now subscribed to our newsletter.');
+            setIsValid(true);
+            setEmail('');
+        }
+    };
+
     return (
-        <footer>
-            <div>&copy; 2025 Company Name Inc. All rights reserved</div>
-            <NavLink aria-label="see the company instagram account" to="https://www.instagram.com/">Instagram</NavLink>
-            <NavLink aria-label="see the company twitter or X account " to="https://x.com/?lang=en">Twitter/X</NavLink>
+        <footer className='footer'>
+            <div className='footer-content'>
+                <div className='footer-section'>
+                    <h2 className='footer-logo'>Code Escape</h2>
+                    <p className='footer-des'>An escape room focused on cybersecurity concepts</p>
+                </div>
+
+                <div className='footer-section'> 
+                    <h3 className='footer-title'>Our Socials</h3>
+                    <div className='social-icons'>
+                        <a href="https://www.facebook.com/" target="_blank">
+                            <img src={fbIcon} alt="Facebook" />
+                        </a>
+                        <a href="https://www.instagram.com/" target="_blank">
+                            <img src={iIcon} alt="Instagram" />
+                        </a>
+                        <a href="https://x.com/" target="_blank">
+                            <img src={TIcon} alt="X" />
+                        </a>
+                    </div>
+                </div>
+
+                <div className='footer-section'>
+                    <h3 className="footer-title">Quick Links</h3>
+                    <ul className="footer-links">
+                        <li>
+                            <Link to="/">Home</Link>
+                        </li>
+                        <li>
+                            <Link to="/login">Login</Link>
+                        </li>
+                        <li>
+                            <Link to="/play"> Escape Room</Link>
+                        </li>
+                    </ul>
+                </div>
+
+                <div className='footer-section'>
+                    <h3 className="footer-title">Subscribe to Our Newsletter</h3>
+                    <form className='newsletter-form' onSubmit={handleSubmit}>
+                        <input
+                            type="email"
+                            placeholder='Your email address...'
+                            className={`browser-default newsletter-input ${
+                                isValid === false ? 'error' : isValid === true ? 'success' : ''
+                            }`}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <button className="btn-subscribe" type="submit">
+                            Subscribe
+                        </button>
+                        {message && (
+                        <p className={`message ${isValid ? 'success-text' : 'error-text'}`}>
+                            {message}
+                        </p>
+                        )}
+                    </form>  
+                </div>
+            </div>
+
+            <div className='footer-bottom' >
+                <p>
+                    Copyright © 2025 Code Escape
+                </p>
+            </div>
         </footer>
     )
 }
