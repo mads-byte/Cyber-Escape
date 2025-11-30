@@ -17,6 +17,7 @@ app.set('trust proxy', true); // allows express to see the real client IP when b
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 const redisClient = new Redis({ //host Redis
@@ -183,13 +184,13 @@ app.post('/user-login', async (req, res, next) => {
             [email]
         );
 
-        if (user.length === 0) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-        }
+        // if (user.length === 0) {
+        //     return res.status(401).json({ error: 'Invalid email or password' });
+        // }
 
         const valid = await bcrypt.compare(password, user[0].password);
 
-        if (!valid) {
+        if (!valid || user.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
