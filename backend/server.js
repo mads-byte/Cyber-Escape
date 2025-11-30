@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import Redis from 'ioredis';
-import RedisStore from "connect-redis";
+import { RedisStore } from "connect-redis"
 
 
 
@@ -21,7 +21,8 @@ app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 const redisClient = new Redis({ //host Redis
     host: process.env.NODE_ENV === 'production' ? process.env.REDIS_HOST : '127.0.0.1', // check if in production to use AWS Redis or local Redis
-    port: REDIS_PORT
+    port: 6379,
+    // tls: {} // TLS required for AWS ElastiCache Redis
 });
 
 redisClient.on('connect', () => console.log('Connected to Redis!'));
