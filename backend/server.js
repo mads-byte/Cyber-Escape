@@ -20,8 +20,8 @@ app.use(express.json());
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 const redisClient = new Redis({ //host Redis
-    host: "127.0.0.1",
-    port: 6379
+    host: process.env.NODE_ENV === 'production' ? process.env.REDIS_HOST : '127.0.0.1', // check if in production to use AWS Redis or local Redis
+    port: REDIS_PORT
 });
 
 redisClient.on('connect', () => console.log('Connected to Redis!'));
