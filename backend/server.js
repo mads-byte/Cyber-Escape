@@ -7,13 +7,9 @@ import bcrypt from "bcrypt"
 import dotenv from 'dotenv';
 dotenv.config();
 import { RateLimiterRedis } from 'rate-limiter-flexible';
-// import Redis from 'ioredis';
 import { RedisStore } from "connect-redis"
 
 import { createClient } from "redis"
-
-
-// Initialize store.
 
 const app = express();
 app.set('trust proxy', true); // allows express to see the real client IP when behind a proxy in production (EC2 instance)
@@ -25,8 +21,12 @@ app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 let redisClient = createClient({ // determine redis URL based on environment
     url: process.env.NODE_ENV === "production"
-        ? `redis://${process.env.REDIS_HOST}:6379` // use the REDIS_HOST set in AWS Elasticache
-        : "redis://127.0.0.1:6379" // local redis for development
+        ? `rediss://${process.env.REDIS_HOST}` // use the REDIS_HOST set in AWS Elasticache
+        : "redis://127.0.0.1:6379", // local redis for development
+    socket: {
+        tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
+        rejectUnauthorized: false
+    }
 });
 
 redisClient.connect().catch(console.error)
