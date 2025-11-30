@@ -7,22 +7,30 @@ import bcrypt from "bcrypt"
 import dotenv from 'dotenv';
 dotenv.config();
 import { RateLimiterRedis } from 'rate-limiter-flexible';
-import Redis from 'ioredis';
-import RedisStore from "connect-redis";
+import { RedisStore } from "connect-redis"
 
-
+import { createClient } from "redis"
 
 const app = express();
 app.set('trust proxy', true); // allows express to see the real client IP when behind a proxy in production (EC2 instance)
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
-const redisClient = new Redis({ //host Redis
-    host: "127.0.0.1",
-    port: 6379
+let redisClient = createClient({ // determine redis URL based on environment
+    url: process.env.NODE_ENV === "production"
+        ? `rediss://${process.env.REDIS_HOST}` // use the REDIS_HOST set in AWS Elasticache
+        : "redis://127.0.0.1:6379", // local redis for development
+    socket: {
+        tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
+        rejectUnauthorized: false
+    }
 });
+
+redisClient.connect().catch(console.error)
+
 
 redisClient.on('connect', () => console.log('Connected to Redis!'));
 redisClient.on('error', (err) => console.error('Redis connection error:', err));
@@ -41,15 +49,15 @@ const loginLimiter = new RateLimiterRedis({ // use redis to store login attempts
 
 app.use(
     session({
-        store: new RedisStore({ client: redisClient }), // use redis to store sessions instead of memory
+        store: new RedisStore({ client: redisClient, prefix: "myapp:" }), // use redis to store sessions instead of memory
         secret: process.env.SESSION_SECRET,
         resave: false, // don't save session if unmodified
         saveUninitialized: false, // don't create session until something stored
         cookie: {
             httpOnly: true, // prevent client side from reading the cookie
             secure: process.env.NODE_ENV === 'production', // set true in production but frontend must be https
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 1000 * 60 * 60 * 2, // expires after 2 hours
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // set to none in production but lax in development
+            maxAge: 1000 * 60 * 60 * 2, // session expires after 2 hours
         },
     })
 );
@@ -188,7 +196,7 @@ app.post('/user-login', async (req, res, next) => {
 
         const valid = await bcrypt.compare(password, user[0].password);
 
-        if (!valid) {
+        if (!valid || user.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
