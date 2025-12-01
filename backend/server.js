@@ -6,7 +6,7 @@ import session from 'express-session';
 import bcrypt from "bcrypt"
 import dotenv from 'dotenv';
 dotenv.config();
-import { RateLimiterRedis } from 'rate-limiter-flexible';
+// Redis for session storage 
 import { RedisStore } from "connect-redis"
 
 import { createClient } from "redis"
@@ -19,37 +19,31 @@ app.use(express.json());
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
-let redisClient = createClient({ // determine redis URL based on environment
+const redisClient = createClient({ // determine redis URL based on environment
     url: process.env.NODE_ENV === "production"
         ? `rediss://${process.env.REDIS_HOST}` // use the REDIS_HOST set in AWS Elasticache
         : "redis://127.0.0.1:6379", // local redis for development
     socket: {
         tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
         rejectUnauthorized: false
-    }
+    },
+    enableOfflineQueue: false // disable offline queue to prevent memory leaks when redis is down, for compatibility with Redis v4 client
 });
 
-redisClient.connect().catch(console.error)
-
-
+// Redis event handlers
 redisClient.on('connect', () => console.log('Connected to Redis!'));
+redisClient.on('ready', () => console.log('Redis ready!'));
 redisClient.on('error', (err) => console.error('Redis connection error:', err));
 
+await redisClient.connect().catch(console.error);
 
 
-const loginLimiter = new RateLimiterRedis({ // use redis to store login attempts and limit them
-    storeClient: redisClient,
-    keyPrefix: 'login',
-    points: 10,          // 10 attempts
-    duration: 15 * 60,  // per 15 minutes
-    blockDuration: 15 * 60, // block for 15 minutes if exceeded  
-});
 
 
 
 app.use(
     session({
-        store: new RedisStore({ client: redisClient, prefix: "myapp:" }), // use redis to store sessions instead of memory
+        store: new RedisStore({ client: redisClient }), // use redis to store sessions instead of memory
         secret: process.env.SESSION_SECRET,
         resave: false, // don't save session if unmodified
         saveUninitialized: false, // don't create session until something stored
@@ -170,15 +164,6 @@ app.post('/register-admin', async (req, res) => {
 
 app.post('/user-login', async (req, res, next) => {
     try {
-        await loginLimiter.consume(req.ip);
-        next();
-    } catch (err) {
-        return res.status(429).json({
-            error: "Too many login attempts. Please wait 15 minutes."
-        });
-    }
-}, async (req, res) => {
-    try {
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -200,9 +185,6 @@ app.post('/user-login', async (req, res, next) => {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Login successful → reset limiter for this IP
-        await loginLimiter.delete(req.ip);
-
         req.session.admin = null;
         req.session.user = {
             id: user[0].id,
@@ -222,15 +204,6 @@ app.post('/user-login', async (req, res, next) => {
 });
 
 app.post('/admin-login', async (req, res, next) => {
-    try {
-        await loginLimiter.consume(req.ip);
-        next();
-    } catch {
-        return res.status(429).json({
-            error: "Too many login attempts. Try again later."
-        });
-    }
-}, async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -252,9 +225,6 @@ app.post('/admin-login', async (req, res, next) => {
         if (!valid) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-
-        await loginLimiter.delete(req.ip);
-
         req.session.user = null;
         req.session.admin = {
             id: admin[0].id,
