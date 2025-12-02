@@ -194,6 +194,15 @@ body {
   cursor: pointer;
 }
 
+.locked {
+  opacity: 0.5;
+}
+
+.play-button:disabled {
+  background-color: #777;
+  cursor: not-allowed;
+}
+
 /* Tablet Responsiveness */
 @media screen and (min-width: 768px) {
   .page-title {

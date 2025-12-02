@@ -1,0 +1,12 @@
+.card {
+  position: relative;
+}
+
+.card img,
+.prompt,
+.topic {
+  width: 100%;
+  display: block;
+  border: 2px solid #fff;
+  border-radius: 6px;
+}
