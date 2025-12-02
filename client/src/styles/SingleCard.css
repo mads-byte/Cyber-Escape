@@ -1,12 +1,83 @@
 .card {
   position: relative;
+  background-color: #462b72;
+  color: #fff;
 }
 
 .card img,
-.prompt,
-.topic {
+.front-card {
   width: 100%;
+  height: 250px;
   display: block;
   border: 2px solid #fff;
   border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* front of card - the text */
+.front-card {
+  transition: all ease-in 0.2s;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  padding: 20px;
+  font-size: 1.2em;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+.card .front-card {
+  transform: rotateY(90deg);
+  position: absolute;
+}
+
+.flipped .front-card {
+  transform: rotateY(0deg);
+}
+
+/* back of card - cover */
+.card .back-card {
+  transition: all ease-in 0.2s;
+  transition-delay: 0.2s;
+}
+
+.card {
+  margin-bottom: 2em;
+}
+
+.flipped .back-card {
+  transform: rotateY(90deg);
+  transition-delay: 0s;
+}
+
+.topic {
+  font-weight: bold;
+  padding-top: 3.5em;
+  font-size: 24px;
+}
+
+@media (min-width: 768px) {
+  .card img,
+  .front-card {
+    height: 300px;
+  }
+
+  .topic {
+    font-weight: bold;
+    padding-top: 4em;
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card img,
+  .front-card {
+    height: 350px;
+  }
+
+  .topic {
+    font-weight: bold;
+    padding-top: 5em;
+    font-size: 25px;
+  }
 }
