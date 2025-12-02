@@ -5,7 +5,13 @@
 }
 
 body {
-  background: linear-gradient(to right, #0a1b3f, #1b275a, #3b1e66);
+  background: linear-gradient(
+    160deg,
+    #141028 0%,
+    #0c0a22 30%,
+    #1b1b4e 70%,
+    #462b72 100%
+  );
   font-family: "Poppins", sans-serif;
   min-height: 100vh;
   color: #ffffff;
@@ -24,6 +30,7 @@ body {
   font-size: 24px;
   font-weight: 600;
   letter-spacing: 3px;
+  margin-bottom: 0.5em;
 }
 
 .page-title:before,
@@ -123,7 +130,7 @@ body {
   justify-content: center;
   max-width: 900px;
   margin: 0 auto;
-  background: linear-gradient(to bottom, #bf40bf, #800080, #593163, #a598df);
+  background: linear-gradient(to bottom, #bf40bf, #800080, #593163, #8f7ce7);
   margin-bottom: 4em;
 }
 
@@ -178,7 +185,7 @@ body {
 
 /* Play Now Button */
 .play-button {
-  background-color: #f7c834;
+  background-color: #ffd300;
   min-width: 300px;
   border: none;
   padding: 10px;
@@ -189,9 +196,19 @@ body {
 }
 
 .play-button:hover {
-  background-color: #ffea70;
+  background-color: #f7c834;
   transition: background-color 0.3s ease;
   cursor: pointer;
+  color: #333131;
+}
+
+.locked {
+  opacity: 0.5;
+}
+
+.play-button:disabled {
+  background-color: #777;
+  cursor: not-allowed;
 }
 
 /* Tablet Responsiveness */
@@ -235,7 +252,7 @@ body {
 /* Desktop Responsiveness */
 @media screen and (min-width: 1024px) {
   .page-title {
-    font-size: 32px;
+    font-size: 35px;
     letter-spacing: 2px;
     padding-top: 30px;
   }
@@ -245,7 +262,7 @@ body {
     flex-direction: row;
     justify-content: center;
     max-width: 900px;
-    padding: 0 40px;
+    padding: 0 60px;
   }
 
   .box-image img {

@@ -5,6 +5,7 @@
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
   },
   "dependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "react-router-dom": "^6.30.2"
   }
 }
