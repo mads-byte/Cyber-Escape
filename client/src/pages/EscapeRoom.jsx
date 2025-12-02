@@ -1,9 +1,15 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/EscapeRoom.css";
+
 import phishingImage from "/src/assets/phishing.jpg";
 import sqlImage from "/src/assets/sql.jpg";
 import securityImage from "/src/assets/security.jpg";
 
 function EscapeRoom() {
+  const navigate = useNavigate();
+  const [currentLevel, setCurrentLevel] = useState(1);
+
   const rooms = [
     {
       title: "Phishing Email Simulator",
@@ -11,6 +17,8 @@ function EscapeRoom() {
       description:
         "Analyze emails and decide whether each message is legitimate or a sneaky phishing attempt. Match them to the right category and uncover the truth!",
       greyBoxContent: "Level 1 | Beginner | 5 minutes",
+      route: "/level1",
+      level: 1,
     },
     {
       title: "Device Security Practices",
@@ -18,6 +26,8 @@ function EscapeRoom() {
       description:
         "Learn to identify unsafe device habits and pick up practical techniques for protecting your data and privacy.",
       greyBoxContent: "Level 2 | Intermediate | 7 minutes",
+      route: "/level2",
+      level: 2,
     },
     {
       title: "SQL Injection",
@@ -25,27 +35,48 @@ function EscapeRoom() {
       description:
         "Explore how SQL injection works by testing vulnerable input fields and discovering how attackers manipulate databases.",
       greyBoxContent: "Level 3 | Advanced | 10 minutes",
+      route: "/level3",
+      level: 3,
     },
   ];
+
+  const handlePlayClick = (room) => {
+    if (room.level > currentLevel) return;
+    navigate(room.route);
+  };
 
   return (
     <main>
       <h1 className="page-title">Online Escape Rooms</h1>
 
-      {rooms.map((room, index) => (
-        <section className="box-container" key={index}>
-          <div className="box-image">
-            <img src={room.image} alt={room.title} />
-          </div>
+      {rooms.map((room, index) => {
+        const isLocked = room.level > currentLevel;
 
-          <div className="box-content">
-            <h2 className="box-content-title">{room.title}</h2>
-            <p className="box-content-description">{room.description}</p>
-            <div className="grey-box">{room.greyBoxContent}</div>
-            <button className="play-button">Play Now</button>
-          </div>
-        </section>
-      ))}
+        return (
+          <section
+            className={`box-container ${isLocked ? "locked" : ""}`}
+            key={index}
+          >
+            <div className="box-image">
+              <img src={room.image} alt={room.title} />
+            </div>
+
+            <div className="box-content">
+              <h2 className="box-content-title">{room.title}</h2>
+              <p className="box-content-description">{room.description}</p>
+              <div className="grey-box">{room.greyBoxContent}</div>
+
+              <button
+                className="play-button"
+                disabled={isLocked}
+                onClick={() => handlePlayClick(room)}
+              >
+                {isLocked ? "Locked" : "Play Now"}
+              </button>
+            </div>
+          </section>
+        );
+      })}
     </main>
   );
 }
