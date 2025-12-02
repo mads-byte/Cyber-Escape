@@ -12,7 +12,7 @@ import { RedisStore } from "connect-redis"
 import { createClient } from "redis"
 
 const app = express();
-app.set('trust proxy', true); // allows express to see the real client IP when behind a proxy in production (EC2 instance)
+app.set('trust proxy', 1); // allows express to see the real client IP when behind a proxy in production (EC2 instance)
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -240,6 +240,69 @@ app.post('/admin-login', async (req, res, next) => {
         console.error('Error during admin login:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+app.put('api/earn-points', async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        const { userId, points } = req.body;
+        if (!userId || !points) {
+            return res.status(400).json({ error: 'userId and points are required' });
+        }
+
+        const [result] = await db.query(
+            'UPDATE users SET experience_points = experience_points + ? WHERE id = ?',
+            [points, userId]
+        );
+
+        if (!result) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ message: `+${points} xp` });
+    } catch (error) {
+        console.error('Error updating experience points:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/me', async (req, res) => {
+    try {
+        if (req.session.user) {
+            const [user] = await db.query(
+                'SELECT * FROM users WHERE id = ?',
+                [req.session.user.id]
+            )
+            return res.json({ user: user[0].username, email: user[0].email, team_code: user[0].team_code, experience_points: user[0].experience_points });
+        } else if (req.session.admin) {
+            const [admin] = await db.query(
+                'SELECT * FROM admins WHERE id = ?',
+                [req.session.admin.id]
+            )
+            const [teamMembers] = await db.query(
+                'SELECT id, username, email, experience_points FROM users WHERE team_code = ?',
+                [admin[0].team_code]
+            )
+            return res.json({ admin: admin[0].username, email: admin[0].email, team_code: admin[0].team_code, team_members: teamMembers });
+        }
+    } catch (err) {
+        console.error('Error fetching user/admin data:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+})
+
+app.post('logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error during logout:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        res.clearCookie('connect.sid');
+        console.log('Logout successful');
+        res.json({ message: 'Logout successful' });
+    });
 });
 
 
