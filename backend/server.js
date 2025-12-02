@@ -242,6 +242,32 @@ app.post('/admin-login', async (req, res, next) => {
     }
 });
 
+app.put('api/earn-points', async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        const { userId, points } = req.body;
+        if (!userId || !points) {
+            return res.status(400).json({ error: 'userId and points are required' });
+        }
+
+        const [result] = await db.query(
+            'UPDATE users SET experience_points = experience_points + ? WHERE id = ?',
+            [points, userId]
+        );
+
+        if (!result) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ message: 'Points added successfully' });
+    } catch (error) {
+        console.error('Error updating experience points:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
