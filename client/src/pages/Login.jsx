@@ -1,187 +1,140 @@
-import '../styles/Login.css'
 import { useState } from "react";
+import "../styles/Login.css";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-    <main>
-        <h1>Login Page Content</h1>
-    </main>
-    // ---- EXAMPLE LOGIN FOR TESTING PURPOSES ONLY ----
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
 
+  const [errors, setErrors] = useState({});
+  const [validFields, setValidFields] = useState({});
+  const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-    // const [mode, setMode] = useState("login"); // login | register
-    // const [role, setRole] = useState("user");  // user | admin
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // // shared fields
-    // const [email, setEmail] = useState("");
-    // const [password, setPassword] = useState("");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value, false);
+  };
 
-    // // registration-specific fields
-    // const [username, setUsername] = useState("");
-    // const [teamCode, setTeamCode] = useState("");
+  const validateField = (name, value, showErrors = true) => {
+    let error = "";
+    let valid = false;
 
-    // const [response, setResponse] = useState("");
+    switch (name) {
+      case "email":
+        if (!emailRegex.test(value)) error = "Enter a valid email address";
+        else valid = true;
+        break;
 
-    // const BACKEND = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+      case "password":
+        if (value.trim().length < 6 || value.length > 30) {
+          error = "Password must be between 6–30 characters.";
+        } else valid = true;
+        break;
 
+      default:
+        break;
+    }
 
-    // async function handleLogin(e) {
-    //     e.preventDefault();
+    setValidFields((prev) => ({ ...prev, [name]: valid }));
+    if (showErrors) setErrors((prev) => ({ ...prev, [name]: error }));
+  };
 
-    //     const endpoint = role === "admin"
-    //         ? "/admin-login"
-    //         : "/user-login";
+  const validateForm = () => {
+    const newErrors = {};
 
-    //     const res = await fetch(BACKEND + endpoint, {
-    //         method: "POST",
-    //         credentials: "include",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({ email, password }),
-    //     });
+    if (!emailRegex.test(formData.email))
+      newErrors.email = "Enter valid email address";
 
-    //     const data = await res.json();
-    //     setResponse(JSON.stringify(data, null, 2));
-    // }
+    if (formData.password.trim().length < 6 || formData.password.length > 30)
+      newErrors.password = "Password must be between 6-30 characters";
 
-    // // ---------------------------
-    // // REGISTRATION HANDLER
-    // // ---------------------------
-    // async function handleRegister(e) {
-    //     e.preventDefault();
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    //     const endpoint = role === "admin"
-    //         ? "/register-admin"
-    //         : "/register-user";
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitted(true);
 
-    //     const body =
-    //         role === "admin"
-    //             ? { username, email, password }
-    //             : { username, email, password, teamCode };
+    if (!validateForm()) return;
 
-    //     const res = await fetch(BACKEND + endpoint, {
-    //         method: "POST",
-    //         credentials: "include",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify(body),
-    //     });
+    try {
+      const user = await login(formData.email, formData.password);
 
-    //     const data = await res.json();
-    //     setResponse(JSON.stringify(data, null, 2));
-    // }
+      // AUTO REDIRECT
+      if (user.accountType === "admin") {
+        navigate("/adminDashboard");
+      } else {
+        navigate("/escapeRoom");
+      }
+    } catch (err) {
+      setMessage(err.message);
+    }
+  };
 
-    // return (
-    //     <div>
-    //         <h1>Login & Registration</h1>
+  const getInputClass = (name) => {
+    if (validFields[name] === true) return "input-valid";
+    if (validFields[name] === false && formData[name]) return "input-invalid";
+  };
 
-    //         {/* Switch between login/register */}
-    //         <div>
-    //             <button onClick={() => setMode("login")}>Login</button>
-    //             <button onClick={() => setMode("register")}>Register</button>
-    //         </div>
+  return (
+    <div className="login--page">
+      <form id="loginForm" className="login--form" onSubmit={handleSubmit}>
+        <h1 className="login">Login</h1>
 
-    //         {/* Switch between user/admin */}
-    //         <div>
-    //             <label>
-    //                 <input
-    //                     type="radio"
-    //                     checked={role === "user"}
-    //                     onChange={() => setRole("user")}
-    //                 /> User
-    //             </label>
+        {message && <div id="message">{message}</div>}
 
-    //             <label>
-    //                 <input
-    //                     type="radio"
-    //                     checked={role === "admin"}
-    //                     onChange={() => setRole("admin")}
-    //                 /> Admin
-    //             </label>
-    //         </div>
+        <div className="login--your-info">
+          <div className="form--group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={getInputClass("email")}
+              placeholder="example@gmail.com"
+            />
+            {submitted && errors.email && (
+              <div className="login--error">{errors.email}</div>
+            )}
+          </div>
 
-    //         {/* ---------------- LOGIN FORM ---------------- */}
-    //         {mode === "login" && (
-    //             <form onSubmit={handleLogin}>
-    //                 <h2>{role === "admin" ? "Admin Login" : "User Login"}</h2>
+          <div className="form--group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={getInputClass("password")}
+              placeholder="Password"
+              maxLength="30"
+            />
+            {submitted && errors.password && (
+              <div className="login--error">{errors.password}</div>
+            )}
+          </div>
 
-    //                 <div>
-    //                     <label>Email:</label>
-    //                     <input
-    //                         type="email"
-    //                         value={email}
-    //                         onChange={(e) => setEmail(e.target.value)}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 <div>
-    //                     <label>Password:</label>
-    //                     <input
-    //                         type="password"
-    //                         value={password}
-    //                         onChange={(e) => setPassword(e.target.value)}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 <button type="submit">Login</button>
-    //             </form>
-    //         )}
-
-    //         {/* ---------------- REGISTER FORM ---------------- */}
-    //         {mode === "register" && (
-    //             <form onSubmit={handleRegister}>
-    //                 <h2>{role === "admin" ? "Admin Registration" : "User Registration"}</h2>
-
-    //                 <div>
-    //                     <label>Username:</label>
-    //                     <input
-    //                         type="text"
-    //                         value={username}
-    //                         onChange={(e) => setUsername(e.target.value)}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 <div>
-    //                     <label>Email:</label>
-    //                     <input
-    //                         type="email"
-    //                         value={email}
-    //                         onChange={(e) => setEmail(e.target.value)}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 <div>
-    //                     <label>Password:</label>
-    //                     <input
-    //                         type="password"
-    //                         value={password}
-    //                         onChange={(e) => setPassword(e.target.value)}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 {/* Only show teamCode for user registration */}
-    //                 {role === "user" && (
-    //                     <div>
-    //                         <label>Team Code:</label>
-    //                         <input
-    //                             type="text"
-    //                             value={teamCode}
-    //                             onChange={(e) => setTeamCode(e.target.value)}
-    //                             required
-    //                         />
-    //                     </div>
-    //                 )}
-
-    //                 <button type="submit">Register</button>
-    //             </form>
-    //         )}
-
-    //         {/* API response */}
-    //         <h3>Response:</h3>
-    //         <pre>{response}</pre>
-    //     </div>
-    // );
+          <div className="login--buttons">
+            <button type="submit" className="btn-login">Login</button>
+            <a href="/signup" className="btn-login">Sign Up</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
 }
+
+
+

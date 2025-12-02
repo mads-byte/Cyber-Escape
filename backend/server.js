@@ -311,5 +311,27 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 
+//testing database: J: worked?
+// app.get("/db-test", async (req, res) => {
+//   try {
+//     const [rows] = await db.query("SELECT 1 + 1 AS result"); // simple test query
+//     res.json({ success: true, result: rows[0].result });
+//   } catch (err) {
+//     console.error("Database test failed:", err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+//test2? --- worked!!!
+// app.get("/users-test", async (req, res) => {
+//   try {
+//     const [rows] = await db.query("SELECT * FROM users LIMIT 5");
+//     res.json({ success: true, users: rows });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
 
 
