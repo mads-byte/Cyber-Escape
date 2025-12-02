@@ -1,17 +1,16 @@
 import "../styles/SingleCard.css";
 
-export default function SingleCard({ card, handleChoice }) {
+export default function SingleCard({ card, handleChoice, flipped, disabled }) {
   const handleClick = () => {
-    handleChoice(card);
+    if (!disabled) {
+      handleChoice(card);
+    }
   };
 
   return (
     <div className="card">
-      <div>
-        <div className="front-card">
-          {card.prompt && <p className="prompt">{card.prompt}</p>}
-          {card.topic && <p className="topic">{card.topic}</p>}
-        </div>
+      <div className={flipped ? "flipped" : ""}>
+        <p className={`front-card ${card.subject || ""}`}>{card.text}</p>
         <img
           className="back-card"
           src="src/assets/cover.jpg"

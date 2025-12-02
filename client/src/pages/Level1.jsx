@@ -13,41 +13,53 @@ function Level1({ setCurrentLevel }) {
 
   const cardData = [
     {
-      prompt:
-        "Hi, your paycheck couldn't be processed this cycle. Please log in here immediately to confirm your employee information: http://company-payroll-verify.com/update Failure to act within 12 hours will delay your payment.",
+      text: "Hi, your paycheck couldn't be processed this cycle. Please log in here immediately to confirm your employee information: http://company-payroll-verify.com/update Failure to act within 12 hours will delay your payment.",
+      pairID: 1,
+      matched: false,
     },
     {
-      prompt:
-        "We attempted delivery today but couldn't reach you. Please schedule redelivery through the link below. (USPS Official Reminder) usps-delivery-help.net/reschedule",
+      text: "We attempted delivery today but couldn't reach you. Please schedule redelivery through the link below. (USPS Official Reminder) usps-delivery-help.net/reschedule",
+      pairID: 2,
+      matched: false,
     },
     {
-      prompt:
-        "Hey! I'm heading into a meeting. Can you grab a $200 Apple Gift Card for me and send the code? I'll reimburse you after.— Your Boss",
+      text: "Hey! Since the holidays are approaching, the company has decided to give $200-$400 Apple Gift cards to selected employees! You will receive a call to confirm that you have received the correct card. — The CEO",
+      pairID: 3,
+      matched: false,
     },
     {
-      prompt:
-        "We detected unusual activity on your debit card ending in 8294. If this wasn't you, reply with your full name, card number, and ZIP code to verify your identity.",
+      text: "We detected unusual activity on your debit card ending in 8294. If this wasn't you, reply with your full name, social security number, and ZIP code to verify your identity.",
+      pairID: 4,
+      matched: false,
     },
     {
-      prompt:
-        "Hello! Attached is your new benefits packet for 2025. This message is from HR. Let us know if you have any trouble opening it.",
+      text: "Hello! Attached is your new benefits packet for 2025. This message is from HR. Let us know if you have any trouble opening it.",
+      pairID: 5,
+      matched: false,
     },
     {
-      prompt:
-        "Hi Max, your professor updated the syllabus and lecture times. The revised file is available in your student portal.",
+      text: "Hey, you! This is your professor from college. Here is the required syllabus and material needed file. Please make sure to complete those by tonight to avoid withdrawal from class. Attachment: download.file.Signsyllabus _and_dowloadfile _TODAY.pdf",
+      pairID: 6,
+      matched: false,
     },
-    { topic: "Payroll Issue" },
-    { topic: "Your Package is Waiting" },
-    { topic: "Quick Question" },
-    { topic: "Bank Alert" },
-    { topic: "Welcome to Your New Benefits Portal" },
-    { topic: "Class Schedule Update" },
+    { text: "Phishing Scam", pairID: 1, matched: false, subject: "topic" },
+    { text: "Official Website", pairID: 2, matched: false, subject: "topic" },
+    { text: "Gift Card Fraud", pairID: 3, matched: false, subject: "topic" },
+    { text: "Bank Alert", pairID: 4, matched: false, subject: "topic" },
+    { text: "Legitimate Email", pairID: 5, matched: false, subject: "topic" },
+    {
+      text: "Drive-by Download Attack",
+      subject: "topic",
+      pairID: 6,
+      matched: false,
+    },
   ];
 
   const [cards, setCards] = useState([]);
   const [turns, setTurns] = useState(0);
   const [choiceOne, setChoiceOne] = useState(null);
   const [choiceTwo, setChoiceTwo] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
   // shuffle cards
   const shuffleCards = () => {
@@ -56,49 +68,71 @@ function Level1({ setCurrentLevel }) {
       .map((card) => ({ ...card, id: Math.random() }));
 
     setCards(shuffledCards);
+    setChoiceOne(null);
+    setChoiceTwo(null);
     setTurns(0);
   };
 
   // handle a choice
   const handleChoice = (card) => {
     choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
-
-    // compare 2 selected cards
-    useEffect(() => {
-      if (choiceOne && choiceTwo) {
-        if (
-          (choiceOne.prompt && choiceTwo.topic) ||
-          (choiceOne.topic && choiceTwo.prompt)
-        ) {
-          console.log("those mathch");
-          resetTurn();
-        } else {
-          console.log("no match");
-          resetTurn();
-        }
-      }
-    }, [choiceOne, choiceTwo]);
-
-    // reset choices & increase turn
-    const resetTurn = () => {
-      setChoiceOne(null);
-      setChoiceTwo(null);
-      setTurns((prevTurns) => prevTurns + 1);
-    };
   };
+
+  // compare 2 selected cards for a match
+  useEffect(() => {
+    if (choiceOne && choiceTwo) {
+      setDisabled(true);
+
+      if (choiceOne.pairID === choiceTwo.pairID) {
+        setCards((prevCards) => {
+          return prevCards.map((card) => {
+            if (card.pairID === choiceOne.pairID) {
+              return { ...card, matched: true };
+            } else {
+              return card;
+            }
+          });
+        });
+        resetTurn();
+      } else {
+        setTimeout(() => resetTurn(), 1000);
+      }
+    }
+  }, [choiceOne, choiceTwo]);
+
+  // check if game is finished
+  useEffect(() => {
+    if (cards.length > 0 && cards.every((card) => card.matched)) {
+      handleFinish();
+    }
+  }, [cards]);
+
+  // reset choices & increase turn
+  const resetTurn = () => {
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setTurns((prev) => prev + 1);
+    setDisabled(false);
+  };
+
   return (
     <div className="MatchGame">
-      <h1>Level 1 Game</h1>
+      <h1>Level 1: Memory Match</h1>
       <button onClick={shuffleCards}>New Game</button>
 
       <div className="card-grid">
         {cards.map((card) => (
-          <SingleCard key={card.id} card={card} handleChoice={handleChoice} />
+          <SingleCard
+            key={card.id}
+            card={card}
+            handleChoice={handleChoice}
+            flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
+          />
         ))}
       </div>
     </div>
   );
 }
-clearImmediate;
 
 export default Level1;
