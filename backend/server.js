@@ -19,23 +19,23 @@ app.use(express.json());
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
-const redisClient = createClient({ // determine redis URL based on environment
-    url: process.env.NODE_ENV === "production"
-        ? `rediss://${process.env.REDIS_HOST}` // use the REDIS_HOST set in AWS Elasticache
-        : "redis://127.0.0.1:6379", // local redis for development
-    socket: {
-        tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
-        rejectUnauthorized: false
-    },
-    enableOfflineQueue: false // disable offline queue to prevent memory leaks when redis is down, for compatibility with Redis v4 client
-});
+// const redisClient = createClient({ // determine redis URL based on environment
+//     url: process.env.NODE_ENV === "production"
+//         ? `rediss://${process.env.REDIS_HOST}` // use the REDIS_HOST set in AWS Elasticache
+//         : "redis://127.0.0.1:6379", // local redis for development
+//     socket: {
+//         tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
+//         rejectUnauthorized: false
+//     },
+//     enableOfflineQueue: false // disable offline queue to prevent memory leaks when redis is down, for compatibility with Redis v4 client
+// });
 
-// Redis event handlers
-redisClient.on('connect', () => console.log('Connected to Redis!'));
-redisClient.on('ready', () => console.log('Redis ready!'));
-redisClient.on('error', (err) => console.error('Redis connection error:', err));
+// // Redis event handlers
+// redisClient.on('connect', () => console.log('Connected to Redis!'));
+// redisClient.on('ready', () => console.log('Redis ready!'));
+// redisClient.on('error', (err) => console.error('Redis connection error:', err));
 
-await redisClient.connect().catch(console.error);
+// await redisClient.connect().catch(console.error);
 
 
 
@@ -43,7 +43,6 @@ await redisClient.connect().catch(console.error);
 
 app.use(
     session({
-        store: new RedisStore({ client: redisClient }), // use redis to store sessions instead of memory
         secret: process.env.SESSION_SECRET,
         resave: false, // don't save session if unmodified
         saveUninitialized: false, // don't create session until something stored
@@ -53,6 +52,10 @@ app.use(
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // set to none in production but lax in development
             maxAge: 1000 * 60 * 60 * 2, // session expires after 2 hours
         },
+        socket: {
+            tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
+            rejectUnauthorized: false
+        }
     })
 );
 
@@ -190,9 +193,6 @@ app.post('/user-login', async (req, res, next) => {
             id: user[0].id,
             account_type: 'user',
             username: user[0].username,
-            email: user[0].email,
-            experience_points: user[0].experience_points,
-            team_code: user[0].team_code
         };
 
         return res.json({ message: "Login successful", user: req.session.user });
@@ -230,8 +230,6 @@ app.post('/admin-login', async (req, res, next) => {
             id: admin[0].id,
             account_type: 'admin',
             username: admin[0].username,
-            email: admin[0].email,
-            team_code: admin[0].team_code
         };
 
         return res.json({ message: "Login successful", admin: req.session.admin });
