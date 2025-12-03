@@ -1,35 +1,36 @@
-.login--page {
+.signup--page {
     min-height: 90vh;
     width: 100vw;
-    background: linear-gradient(160deg, #141028 0%, #0c0a22 30%, #1b1b4e 70%, #462b72 100%); 
+    background: linear-gradient(160deg, #141028 0%, #0c0a22 30%, #1b1b4e 70%, #462b72 100%);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.login--form {
+.signup--form {
     background-color: #141028;
-    width: 30%; /*for media query:380px; */
-    height: 60vh;
+    width: 30%;
+    height: auto;
     padding: 35px 40px;
     border-radius: 25px;
     box-shadow: 0 3px 7px #ae0874;
 }
 
 
-.login {
+.signup-title {
     font-family: "GlitchGoblin", sans-serif;
     text-shadow: 2px 2px #ae0874;
     text-align: center;
-    font-size: 65px; /* font-size: 28px; */
+    font-size: 55px;
     font-weight: bold;
-    color: white; /*#5f2eea;*/
-    margin-bottom: 20px;
+    color: white;
+    margin-bottom: 25px;
 }
-.login--your-info {
-    margin-top: 30px; /*change for media*/
-    
+
+.signup--inputs {
+    margin-top: 20px;
 }
+
 
 .form--group {
     display: flex;
@@ -46,15 +47,18 @@
 }
 
 
-.form--group input {
+.form--group input,
+.form--group select {
     padding: 12px 14px;
     font-size: 15px;
     border-radius: 12px;
     border: 2px solid #e3e3e3;
     outline: none;
-    /* transition: border-color 0.2s; */
+    transition: border-color 0.2s;
     box-shadow: 0 2px 6px #ae0874;
+    background: white;
 }
+
 
 .input-valid {
     border-color: #5cb85c !important;
@@ -64,29 +68,28 @@
     border-color: #d9534f !important;
 }
 
-.form--group input:focus {
+
+.form--group input:focus,
+.form--group select:focus {
     border-color: #5f2eea;
 }
 
-
-
-.login--error {
+.signup--error {
     color: #d9534f;
     font-size: 13px;
     margin-top: 5px;
 }
 
 
-
-
-.login--buttons {
+.signup--buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 25px;
 }
 
-.btn-login,
-.btn-signup {
+
+.btn-signup,
+.btn-back {
     width: 48%;
     padding: 12px 0;
     border-radius: 12px;
@@ -98,14 +101,15 @@
     background: #5f2eea;
     color: white;
     text-decoration: none;
+    text-align: center;
 }
 
-.btn-login:hover,
-.btn-signup:hover {
+.btn-signup:hover,
+.btn-back:hover {
     opacity: 0.85;
 }
 
-#message {
+#signup-message {
     text-align: center;
     margin-bottom: 10px;
     font-size: 14px;
