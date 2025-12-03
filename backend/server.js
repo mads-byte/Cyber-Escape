@@ -6,10 +6,7 @@ import session from 'express-session';
 import bcrypt from "bcrypt"
 import dotenv from 'dotenv';
 dotenv.config();
-// Redis for session storage 
-import { RedisStore } from "connect-redis"
 
-import { createClient } from "redis"
 
 const app = express();
 app.set('trust proxy', 1); // allows express to see the real client IP when behind a proxy in production (EC2 instance)
@@ -18,27 +15,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
-
-// const redisClient = createClient({ // determine redis URL based on environment
-//     url: process.env.NODE_ENV === "production"
-//         ? `rediss://${process.env.REDIS_HOST}` // use the REDIS_HOST set in AWS Elasticache
-//         : "redis://127.0.0.1:6379", // local redis for development
-//     socket: {
-//         tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
-//         rejectUnauthorized: false
-//     },
-//     enableOfflineQueue: false // disable offline queue to prevent memory leaks when redis is down, for compatibility with Redis v4 client
-// });
-
-// // Redis event handlers
-// redisClient.on('connect', () => console.log('Connected to Redis!'));
-// redisClient.on('ready', () => console.log('Redis ready!'));
-// redisClient.on('error', (err) => console.error('Redis connection error:', err));
-
-// await redisClient.connect().catch(console.error);
-
-
-
 
 
 app.use(
@@ -52,10 +28,6 @@ app.use(
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // set to none in production but lax in development
             maxAge: 1000 * 60 * 60 * 2, // session expires after 2 hours
         },
-        socket: {
-            tls: process.env.NODE_ENV === "production", // use TLS in production for AWS Elasticache
-            rejectUnauthorized: false
-        }
     })
 );
 
