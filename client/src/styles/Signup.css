@@ -1,5 +1,6 @@
 .signup--page {
-    min-height: 90vh;
+    min-height: 100vh;
+    margin-bottom: 10px;
     width: 100vw;
     background: linear-gradient(160deg, #141028 0%, #0c0a22 30%, #1b1b4e 70%, #462b72 100%);
     display: flex;
@@ -7,21 +8,13 @@
     align-items: center;
 }
 
-.signup--form {
-    background-color: #141028;
-    width: 30%;
-    height: auto;
-    padding: 35px 40px;
-    border-radius: 25px;
-    box-shadow: 0 3px 7px #ae0874;
-}
 
 
 .signup-title {
     font-family: "GlitchGoblin", sans-serif;
     text-shadow: 2px 2px #ae0874;
     text-align: center;
-    font-size: 55px;
+    font-size: 45px;
     font-weight: bold;
     color: white;
     margin-bottom: 25px;
@@ -35,7 +28,7 @@
 .form--group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form--group label {
@@ -88,8 +81,7 @@
 }
 
 
-.btn-signup,
-.btn-back {
+.btn-signup {
     width: 48%;
     padding: 12px 0;
     border-radius: 12px;
@@ -104,8 +96,7 @@
     text-align: center;
 }
 
-.btn-signup:hover,
-.btn-back:hover {
+.btn-signup:hover {
     opacity: 0.85;
 }
 
@@ -116,6 +107,49 @@
     color: #d9534f;
 }
 
-@media (max-width: 788px) and (min-width: 755px) {
-    
+.accswitch {
+    margin-top: 15px;
+    font-size: 18px;
 }
+.acc-link {
+    
+    color: #ae0874;
+    font-weight: 900;
+}
+/* EXTRA SMALL DEVICES (339px*/
+@media (max-width: 339px) {
+  
+  .sign--form {
+    width: 92%;            
+    padding: 20px 15px;  
+    border-radius: 18px;    
+  }
+
+  .signup-title,
+  .login {                  
+    font-size: 32px;        
+    margin-bottom: 18px;
+  }
+
+  .form--group input,
+  .form--group select {
+    padding: 10px 12px;     
+    font-size: 14px;
+  }
+
+  .form--group {
+    margin-bottom: 12px;
+  }
+
+  .btn-login {
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  .accswitch {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+}
+
+
