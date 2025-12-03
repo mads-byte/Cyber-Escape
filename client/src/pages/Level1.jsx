@@ -103,7 +103,7 @@ function Level1({ setCurrentLevel }) {
   // check if game is finished
   useEffect(() => {
     if (cards.length > 0 && cards.every((card) => card.matched)) {
-      handleFinish();
+      return handleFinish();
     }
   }, [cards]);
 
