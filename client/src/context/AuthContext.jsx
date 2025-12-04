@@ -108,8 +108,8 @@ export function useAuth() {
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-//url to backend API (frontend-api in .env)
-  const API_URL =  import.meta.env.VITE_BACKEND_URL;/*"http://localhost:3000";*/
+  //url to backend API (frontend-api in .env)
+  const API_URL = import.meta.env.VITE_BACKEND_URL;/*"http://localhost:3000";*/
 
   // User Registration
   async function registerUser(username, email, password, teamCode) {
@@ -174,12 +174,22 @@ export default function AuthProvider({ children }) {
       setUser(adminData);
       return adminData;
     }
-  //if both fail, throw error
+    //if both fail, throw error
     throw new Error(data.error || "Invalid credentials");
   }
 
-  function logout() {
+  async function logout() {
+    const API_URL = import.meta.env.VITE_BACKEND_URL
+    const res = await fetch(`${API_URL}/logout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include"
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    console.log(data)
     setUser(null); //clears user info
+    return data;
   }
 
   const value = {
