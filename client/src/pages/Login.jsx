@@ -75,10 +75,10 @@ export default function Login() {
       if (user.accountType === "admin") {
         navigate("/adminDashboard");
       } else {
-        navigate("/escapeRoom");
+        navigate("/play");
       }
     } catch (err) {
-      setMessage(err.message);
+      setMessage(err.message || "Something went wrong. Try again.");
     }
   };
 
@@ -125,11 +125,13 @@ export default function Login() {
               <div className="login--error">{errors.password}</div>
             )}
           </div>
-
-          <div className="login--buttons">
             <button type="submit" className="btn-login">Login</button>
-            <a href="/signup" className="btn-login">Sign Up</a>
-          </div>
+            <p className="authswitch">
+                Don't have an account?{"  "}
+                <span className="auth-link" onClick={() => navigate("/signup")}>
+                    Sign up
+                </span>
+            </p>
         </div>
       </form>
     </div>
