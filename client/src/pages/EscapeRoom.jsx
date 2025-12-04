@@ -6,9 +6,8 @@ import phishingImage from "/src/assets/phishing.jpg";
 import sqlImage from "/src/assets/sql.jpg";
 import securityImage from "/src/assets/security.jpg";
 
-function EscapeRoom() {
+function EscapeRoom({ currentLevel, setCurrentLevel }) {
   const navigate = useNavigate();
-  const [currentLevel, setCurrentLevel] = useState(1);
 
   const rooms = [
     {
@@ -16,7 +15,7 @@ function EscapeRoom() {
       image: phishingImage,
       description:
         "Analyze emails and decide whether each message is legitimate or a sneaky phishing attempt. Match them to the right category and uncover the truth!",
-      greyBoxContent: "Level 1 | Beginner | 5 minutes",
+      greyBoxContent: "Level 1 | Beginner | 3 minutes",
       route: "/level1",
       level: 1,
     },
@@ -25,7 +24,7 @@ function EscapeRoom() {
       image: securityImage,
       description:
         "Learn to identify unsafe device habits and pick up practical techniques for protecting your data and privacy.",
-      greyBoxContent: "Level 2 | Intermediate | 7 minutes",
+      greyBoxContent: "Level 2 | Intermediate | 5 minutes",
       route: "/level2",
       level: 2,
     },
@@ -34,7 +33,7 @@ function EscapeRoom() {
       image: sqlImage,
       description:
         "Explore how SQL injection works by testing vulnerable input fields and discovering how attackers manipulate databases.",
-      greyBoxContent: "Level 3 | Advanced | 10 minutes",
+      greyBoxContent: "Level 3 | Advanced | 7 minutes",
       route: "/level3",
       level: 3,
     },

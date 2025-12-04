@@ -8,8 +8,10 @@ import Level1 from "./pages/Level1.jsx";
 import Level2 from "./pages/Level2.jsx";
 import Level3 from "./pages/Level3.jsx";
 import Footer from "./components/Footer.jsx";
+import { useState } from "react";
 
 function App() {
+  const [currentLevel, setCurrentLevel] = useState(1);
   return (
     <Router>
       <Navbar />
@@ -17,9 +19,17 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/play" element={<EscapeRoom />} />
-          <Route path="/signup"element={ <Signup /> } />
-          <Route path="/level1" element={<Level1 />} />
+          <Route
+            path="/play"
+            element={<EscapeRoom />}
+            currentLevel={currentLevel}
+            setCurrentLevel={setCurrentLevel}
+          />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/level1"
+            element={<Level1 setCurrentLevel={setCurrentLevel} />}
+          />
           <Route path="/level2" element={<Level2 />} />
           <Route path="/level3" element={<Level3 />} />
         </Routes>
