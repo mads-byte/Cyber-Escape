@@ -512,7 +512,7 @@ app.put('api/earn-points', async (req, res) => {
         }
 
         const [result] = await db.query(
-            'UPDATE users SET experience_points = exp_points + ? WHERE id = ?', 
+            'UPDATE users SET experience_points = exp_points + ? WHERE id = ?',
             [points, userId]
         );
 
@@ -552,7 +552,7 @@ app.get('/api/me', async (req, res) => {
     }
 })
 
-app.post('logout', (req, res) => {
+app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Error during logout:', err);
