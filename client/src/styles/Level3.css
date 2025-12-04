@@ -1,5 +1,5 @@
-level-page-container {
-  min-height: calc(100vh - 180px); 
+.level-page-container {
+  min-height: calc(100vh - 180px);
   padding: 3rem 2rem 4rem;
   color: #ffffff;
   display: flex;
@@ -229,4 +229,3 @@ level-page-container {
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
 }
-
