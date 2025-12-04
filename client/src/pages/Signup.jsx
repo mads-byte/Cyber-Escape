@@ -1,23 +1,19 @@
 import { useState } from "react";
-import "../styles/Signup.css"; 
+import "../styles/Login.css"; 
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"
 
 export default function Signup() {
   const navigate = useNavigate();
-  const {registerUser, registerAdmin } = useAuth();
 
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    teamCode: "",
     accountType: "user"
   });
 
   const [errors, setErrors] = useState({});
-//   const [validFields, setValidFields] = useState({});
+  const [validFields, setValidFields] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -35,9 +31,6 @@ export default function Signup() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.username.trim())
-        newErrors.username = "Username is required";
-
     if (!emailRegex.test(formData.email))
       newErrors.email = "Enter valid email address";
 
@@ -46,13 +39,7 @@ export default function Signup() {
 
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
-
-
-    //Users must provide a team code
-    if (formData.accountType === "user" && !formData.teamCode.trim())
-        newErrors.teamCode = "Team code is required";
-
-    //Saving errors so UI can display them
+    //Saving errors so UI can displau them
     setErrors(newErrors);
     //if no err -> return true
     return Object.keys(newErrors).length === 0;
@@ -62,56 +49,37 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
-    setMessage("");
 
     if (!validateForm()) return;
 
     try {
-        let response;
+        //sending form data to backend
+      const res = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
 
-        if (formData.accountType == "user"){
-            //send to /register-user
-            response = await registerUser(
-                formData.username,
-                formData.email,
-                formData.password,
-                formData.teamCode,
-            );
-        }else {
-            //send to /register-admin
-            response = await registerAdmin(
-                formData.username,
-                formData.email,
-                formData.password
-            );
-        }
+      const data = await res.json();
 
-        navigate("/login");
+      if (!data.success) {
+        setMessage(data.message);
+        return;
+      }
+      //send user to login page on succesfull signup
+      navigate("/login");
+
     } catch (err) {
-        setMessage(err.message || "Something went wrong");
+      setMessage("Signup failed. Try again.");
     }
   };
 
   return (
-    <div className="signup--page">
-      <form className="sign--form" onSubmit={handleSubmit}>
-        <h1 className="login">Create Account</h1>
+    <div className="login--page">
+      <form className="login--form" onSubmit={handleSubmit}>
+        <h1 className="login">Sign Up</h1>
 
         {message && <div id="message">{message}</div>}
-
-        <div className="form--group">
-            <label>Username</label>
-            <input
-                type="text"
-                name="username"
-                placeholder="username"
-                value={formData.username}
-                onChange={handleChange}
-            />
-            {submitted && errors.username && (
-                <div className="login-error">{errors.username}</div>
-            )}
-        </div>
 
         <div className="form--group">
           <label>Email</label>
@@ -149,22 +117,6 @@ export default function Signup() {
           {submitted && errors.confirmPassword && <div className="login--error">{errors.confirmPassword}</div>}
         </div>
 
-        {formData.accountType === "user" && (
-            <div className="form--group">
-                <label>Team Code</label>
-                <input 
-                    type="text"
-                    name="teamCode"
-                    placeholder="ABCDE"
-                    value={formData.teamCode}
-                    onChange={handleChange}
-                />
-                {submitted && errors.teamCode && (
-                    <div className="login--error">{errors.teamCode}</div>
-                )}
-            </div>
-        )}
-
         <div className="form--group">
           <label>Account Type</label>
           <select className="accoutntype" name="accountType" value={formData.accountType} onChange={handleChange}>
@@ -173,16 +125,11 @@ export default function Signup() {
           </select>
         </div>
 
+        <div className="login--buttons">
           <button type="submit" className="btn-login">Create Account</button>
-          <p className="accswitch">
-            Back to {"  "}
-            <span className="acc-link" onClick={() => navigate("/login")}>
-                Login
-            </span>
-
-          </p>
+          <a href="/login" className="btn-login">Back to Login</a>
+        </div>
       </form>
     </div>
   );
 }
-

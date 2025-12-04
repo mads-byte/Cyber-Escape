@@ -9,8 +9,8 @@ export function useAuth() {
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-//url to backend API (frontend-api in .env)
-  const API_URL =  import.meta.env.VITE_BACKEND_URL;/*"http://localhost:3000";*/
+//url to backend API 
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
   // User Registration
   async function registerUser(username, email, password, teamCode) {
