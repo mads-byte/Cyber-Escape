@@ -223,7 +223,7 @@ app.put('api/earn-points', async (req, res) => {
         }
 
         const [result] = await db.query(
-            'UPDATE users SET experience_points = experience_points + ? WHERE id = ?',
+            'UPDATE users SET experience_points = exp_points + ? WHERE id = ?',
             [points, userId]
         );
 
@@ -245,14 +245,14 @@ app.get('/api/me', async (req, res) => {
                 'SELECT * FROM users WHERE id = ?',
                 [req.session.user.id]
             )
-            return res.json({ user: user[0].username, email: user[0].email, team_code: user[0].team_code, experience_points: user[0].experience_points });
+            return res.json({ user: user[0].username, email: user[0].email, team_code: user[0].team_code, exp_points: user[0].exp_points });
         } else if (req.session.admin) {
             const [admin] = await db.query(
                 'SELECT * FROM admins WHERE id = ?',
                 [req.session.admin.id]
             )
             const [teamMembers] = await db.query(
-                'SELECT id, username, email, experience_points FROM users WHERE team_code = ?',
+                'SELECT id, username, email, exp_points FROM users WHERE team_code = ?',
                 [admin[0].team_code]
             )
             return res.json({ admin: admin[0].username, email: admin[0].email, team_code: admin[0].team_code, team_members: teamMembers });
