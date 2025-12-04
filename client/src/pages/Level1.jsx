@@ -8,7 +8,7 @@ function Level1({ setCurrentLevel }) {
 
   const handleFinish = () => {
     setCurrentLevel(2);
-    navigate("/");
+    navigate("/level2");
   };
 
   const cardData = [

@@ -3,6 +3,7 @@
 }
 
 h1 {
+  margin-top: 1em;
   margin-bottom: 1em;
 }
 
@@ -12,7 +13,6 @@ h1 {
   padding: 2rem;
   background: linear-gradient(180deg, #3e2a60 0%, #321061 100%);
   border-radius: 8px;
-  /* box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.6); */
   box-shadow: 1px 1px 8px 4px rgba(12, 5, 32, 0.6);
   text-align: center;
   margin-bottom: 3em;
@@ -88,8 +88,7 @@ h1 {
   padding: 1rem 2rem;
   border: none;
   border-radius: 24px;
-  /* background: linear-gradient(180deg, #81f1fb 0%, #73d2f8 100%); */
-  background: #39a0f5;
+  background: linear-gradient(160deg, #141028 0%, #0c0a22 30%, #1b1b4e 70%);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-size: 18px;
@@ -97,25 +96,21 @@ h1 {
 
 .answer button:hover,
 .answer button:focus {
-  /* background: linear-gradient(180deg, #bf48f6 0%, #9b50f2 100%); */
   background: #9d5af5;
   color: white;
 }
 
 .answer button.selected {
-  /* background: linear-gradient(180deg, #fbda81 0%, #f8b173 100%); */
   background: #f5a76c;
   color: #2c203d;
 }
 
 .answer button.correct {
-  /* background: linear-gradient(180deg, #a1fa61 0%, #52d482 100%); */
   background: #5af59d;
   color: #2c203d;
 }
 
 .answer button.wrong {
-  /* background: linear-gradient(180deg, #f96fb1 0%, #f52b8c 100%); */
   background: #f55a98;
   color: #2c203d;
 }

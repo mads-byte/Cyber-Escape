@@ -57,7 +57,7 @@ export default [
     answers: [
       "Most IoT devices do not receive frequent software updates",
       "IoT devices require unencrypted wireless connections",
-      "IoT devices require unencrypted wireless connections",
+      "IoT devices cannot function on an isolated network with only an Internet connection",
       "Most IoT devices do not require an Internet connection and are unable to receive new updates",
     ],
   },
