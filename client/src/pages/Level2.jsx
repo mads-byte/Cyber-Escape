@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 
 import QUESTIONS from "../questions.js";
 import Question from "../components/Question.jsx";
+import Summary from "../components/Summary.jsx";
 import "../styles/Level2.css";
 
 function Level2() {
@@ -26,11 +27,7 @@ function Level2() {
   );
 
   if (quizIsComplete) {
-    return (
-      <div id="summary">
-        <h2>Quiz Completed</h2>
-      </div>
-    );
+    return <Summary userAnswers={userAnswers} />;
   }
 
   return (
