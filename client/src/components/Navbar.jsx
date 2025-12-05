@@ -40,10 +40,10 @@ function Navbar() {
                 }}
             >
                 <ul className="nav_list">
-                    <li className="nav_item"><Link to="/" className="nav_link">Home</Link></li>
 
                     {!user && (
                         <>
+                            <li className="nav_item"><Link to="/" className="nav_link">Home</Link></li>
                             <li className="nav_item"><Link to="/play" className="nav_link">Escape Room</Link></li>
                             <li className="nav_item"><Link to="/login" className="nav_link">Login</Link></li>
                         </>
@@ -58,6 +58,7 @@ function Navbar() {
 
                     {user?.accountType === "user" && (
                         <>
+                            <li className="nav_item"><Link to="/" className="nav_link">Home</Link></li>
                             <li className="nav_item"><Link to="/play" className="nav_link">Escape Room</Link></li>
                             <li className="nav_item" onClick={logout}><Link to="/login" className="nav_link">Logout</Link></li>
                         </>
