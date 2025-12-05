@@ -208,7 +208,7 @@ app.post("/admin-login", async (req, res, next) => {
     }
 });
 
-app.put("api/earn-points", async (req, res) => {
+app.put("/api/earn-points", async (req, res) => {
     try {
         if (!req.session.user) {
             return res.status(401).json({ error: "Unauthorized" });
@@ -219,7 +219,7 @@ app.put("api/earn-points", async (req, res) => {
         }
 
         const [result] = await db.query(
-            "UPDATE users SET experience_points = exp_points + ? WHERE id = ?",
+            "UPDATE users SET exp_points = exp_points + ? WHERE id = ?",
             [points, userId]
         );
 
