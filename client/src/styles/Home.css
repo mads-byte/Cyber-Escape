@@ -1,6 +1,20 @@
+@keyframes pulse {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
 main {
     align-content: center;
-    text-align: center; 
+    text-align: center;
     font-family: 'Space Grotesk', sans-serif;
 
 }
@@ -9,14 +23,16 @@ main {
     position: relative;
     width: 100%;
     overflow: hidden;
-    
+
 }
+
 .header-img {
     width: 100%;
     height: 80vh;
     display: block;
     object-fit: cover;
 }
+
 .img-overlay {
     position: absolute;
     top: 40%;
@@ -27,27 +43,48 @@ main {
 
 .img-overlay h1 {
     font-weight: bold;
-    font-size: 4rem; 
+    font-size: 4rem;
     font-family: "GlitchGoblin", sans-serif;
     text-shadow: 2px 2px purple;
 
 }
 
+.fly-header {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 2s ease;
+}
+
+.fly-header.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .hero-btn {
-  display: inline-block;
-  margin-top: 5px;
-  padding: 1rem 2rem; 
-  background-color: #FFD300;
-  color: #000;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 20px;
-} 
+    animation: pulse 1s infinite ease-in-out;
+    display: inline-block;
+    margin-top: 5px;
+    padding: 1rem 2rem;
+    background-color: #FFD300;
+    color: #000;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.3s;
+}
+
+.hero-btn:hover {
+    color: white;
+    background-color: purple;
+}
+
+.spacer {
+    height: 10vh;
+}
 
 .about {
     padding: 80px 20px;
-    background-color: #141028;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -55,25 +92,26 @@ main {
 
 .about h1 {
     font-family: "GlitchGoblin", sans-serif;
-    color: #ae0874;
+    color: #ff56c4;
     font-size: 2rem;
     font-weight: 700;
 }
+
 .about p {
-    color:#47758f;
-    font-size: 23px; 
+    color: #63b6e6;
+    font-size: 23px;
     width: 60%;
     margin-top: 15px;
     line-height: 1.4;
-    
+
 }
 
 .pts {
-    padding: 140px 20px; 
+    padding: 140px 20px;
     background: linear-gradient(160deg, #141028 0%, #0c0a22 30%, #1b1b4e 70%, #462b72 100%);
     color: white;
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 30px;
@@ -121,7 +159,7 @@ main {
 @media (max-width: 754px) {
 
     .img-overlay h1 {
-        font-size: 3rem;   
+        font-size: 3rem;
         text-shadow: 1px 1px purple;
     }
 
@@ -131,18 +169,18 @@ main {
     }
 
     .about p {
-        font-size: 20px;    
-        width: 80%;        
+        font-size: 20px;
+        width: 80%;
     }
 
     .pts {
         flex-direction: column;
-        align-items: center;   
+        align-items: center;
         /* padding: 100px 20px;    */
     }
 
     .info-sec {
-        max-width: 500px;  
+        max-width: 500px;
         width: 100%;
         flex: none;
     }

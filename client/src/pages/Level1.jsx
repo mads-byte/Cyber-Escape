@@ -2,14 +2,56 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SingleCard from "../components/SingleCard.jsx";
 import "../styles/Level1.css";
+import { useContext } from "react";
+// import { AuthContext } from "../context/AuthContext";
+
 
 function Level1({ setCurrentLevel }) {
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const res = await fetch("http://localhost:3000/api/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch admin data`);
+        }
+
+        const data = await res.json();
+        setUserData(data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch admin data");
+      }
+    }
+
+    fetchUserData();
+  }, []);
+
   const navigate = useNavigate();
 
-  const handleFinish = () => {
+  async function handleFinish() {
+    let id = userData.id
+    let xppts = 30
+    const API_URL = import.meta.env.VITE_BACKEND_URL;
+    const res = await fetch(`${API_URL}/api/earn-points`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ userId: id, points: xppts }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    if (res.ok) { console.log(data) }
     setCurrentLevel(2);
     navigate("/level2");
-  };
+    return data;
+  }
+
 
   const cardData = [
     {
@@ -101,9 +143,17 @@ function Level1({ setCurrentLevel }) {
   }, [choiceOne, choiceTwo]);
 
   // check if game is finished
+  // useEffect(() => {
+  //   if (cards.length > 0 && cards.every((card) => card.matched)) {
+  //     return handleFinish();
+  //   }
+  // }, [cards]);
+
   useEffect(() => {
     if (cards.length > 0 && cards.every((card) => card.matched)) {
-      return handleFinish();
+      (async () => {
+        await handleFinish();
+      })();
     }
   }, [cards]);
 

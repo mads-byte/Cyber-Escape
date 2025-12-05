@@ -5,9 +5,26 @@ import "../styles/EscapeRoom.css";
 import phishingImage from "/src/assets/phishing.jpg";
 import sqlImage from "/src/assets/sql.jpg";
 import securityImage from "/src/assets/security.jpg";
+import { motion, useInView, useAnimation } from 'framer-motion'
 
 function EscapeRoom({ currentLevel, setCurrentLevel }) {
   const navigate = useNavigate();
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.5,
+        duration: 2
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, x: 30 },
+    show: { opacity: 1, x: 0 }
+  };
 
   const rooms = [
     {
@@ -45,38 +62,47 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
   };
 
   return (
-    <main>
-      <h1 className="page-title">Online Escape Rooms</h1>
+    <motion.main
+      variants={container}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true }}>
+
+      <h1 aria-label="Online Escape Rooms" className="page-title">Online Escape Rooms</h1>
 
       {rooms.map((room, index) => {
         const isLocked = room.level > currentLevel;
 
         return (
-          <section
+          <motion.section
             className={`box-container ${isLocked ? "locked" : ""}`}
             key={index}
+            variants={item}
           >
-            <div className="box-image">
-              <img src={room.image} alt={room.title} />
-            </div>
 
-            <div className="box-content">
-              <h2 className="box-content-title">{room.title}</h2>
-              <p className="box-content-description">{room.description}</p>
-              <div className="grey-box">{room.greyBoxContent}</div>
+            <div className="content-container">
+              <div className="box-image">
+                <img src={room.image} alt={room.title} />
+              </div>
 
-              <button
-                className="play-button"
-                disabled={isLocked}
-                onClick={() => handlePlayClick(room)}
-              >
-                {isLocked ? "Locked" : "Play Now"}
-              </button>
+              <div className="box-content">
+                <h2 className="box-content-title">{room.title}</h2>
+                <p className="box-content-description">{room.description}</p>
+                <div className="grey-box">{room.greyBoxContent}</div>
+
+                <button
+                  className="play-button"
+                  disabled={isLocked}
+                  onClick={() => handlePlayClick(room)}
+                >
+                  {isLocked ? "Locked" : "Play Now"}
+                </button>
+              </div>
             </div>
-          </section>
+          </motion.section>
         );
       })}
-    </main>
+    </motion.main>
   );
 }
 

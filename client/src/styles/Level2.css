@@ -82,6 +82,7 @@ h1 {
 }
 
 .answer button {
+  color: white;
   display: inline-block;
   width: 100%;
   font-family: "Roboto Condensed", sans-serif;
