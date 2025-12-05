@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SingleCard from "../components/SingleCard.jsx";
 import "../styles/Level1.css";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 // import { AuthContext } from "../context/AuthContext";
 
 
