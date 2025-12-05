@@ -3,7 +3,7 @@
   margin: 40px auto;
 }
 
-button {
+.MatchGame button {
   background: none;
   border: 2px solid #fff;
   padding: 6px 12px;
@@ -14,7 +14,8 @@ button {
   font-size: 1em;
   margin-top: 2em;
 }
-button:hover {
+
+.MatchGame button:hover {
   background: #c23866;
   color: #fff;
 }

@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    background: #111;
+    background-color: #342d59;
     color: white;
     position: relative;
     z-index: 20;
@@ -18,8 +18,10 @@
 }
 
 .menu-icon {
+    color: white;
     margin-left: auto;
-    margin-bottom: 25px;
+    background-color: transparent;
+    /* margin-bottom: 25px; */
     display: block;
     align-items: center;
     font-size: 1.3rem;
@@ -29,7 +31,7 @@
 
 .nav_menu {
     width: 100%;
-    background: #222;
+    background-color: #222;
     position: absolute;
     top: 100%;
     left: 0;
