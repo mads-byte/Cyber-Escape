@@ -15,13 +15,13 @@
     font-weight: bold;
     text-decoration: none;
     color: white;
+    font-family: 'Space Grotesk', sans-serif;
 }
 
 .menu-icon {
     color: white;
     margin-left: auto;
     background-color: transparent;
-    /* margin-bottom: 25px; */
     display: block;
     align-items: center;
     font-size: 1.3rem;

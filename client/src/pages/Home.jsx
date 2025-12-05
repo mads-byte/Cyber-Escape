@@ -46,12 +46,12 @@ function Home() {
             <motion.div
                 ref={ref}
                 variants={{
-                    hidden: { opacity: 0, x: -100 },
+                    hidden: { opacity: 0, x: -200 },
                     visible: { opacity: 1, x: 0 },
                 }}
                 initial="hidden"
                 animate={controls}
-                transition={{ duration: 1.5, ease: "easeOut" }}
+                transition={{ duration: 2.5, ease: "easeOut" }}
                 className='about'
             >
 
@@ -66,12 +66,12 @@ function Home() {
             <motion.div
                 ref={ref2}
                 variants={{
-                    hidden2: { opacity: 0, x: -150 },
+                    hidden2: { opacity: 0, x: -200 },
                     visible2: { opacity: 1, x: 0 },
                 }}
                 initial="hidden2"
                 animate={controls}
-                transition={{ duration: 2, ease: "easeOut" }}
+                transition={{ duration: 2.5, ease: "easeOut" }}
                 className='pts'
             >
                 <section className='pts'>
