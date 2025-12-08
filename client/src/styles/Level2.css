@@ -239,3 +239,11 @@ h1 {
   letter-spacing: 0.1rem;
   margin-top: 1em;
 }
+
+.status-message {
+  margin-bottom: 1em;
+  font-size: 18px;
+  font-family: "Roboto Condensed", sans-serif;
+  color: #dbceee;
+  text-transform: uppercase;
+}

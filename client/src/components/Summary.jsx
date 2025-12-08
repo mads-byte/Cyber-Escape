@@ -1,66 +1,21 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QUESTIONS from "../questions.js";
 
-function Summary({ userAnswers, setCurrentLevel }) {
+function Summary({ userAnswers }) {
   const navigate = useNavigate();
 
-  // Filters answers that the user skipped
-  const skippedAnswers = userAnswers.filter((answer) => answer === null);
-  // Filters answers that are correct by checking if the user's answer matches the first answer
+  // Filter out correct answers by comparing user answers with the first answer in QUESTIONS
   const correctAnswers = userAnswers.filter(
     (answer, index) => answer === QUESTIONS[index].answers[0]
   );
 
-  // Calculate percentage of skipped answers
-  const skippedAnswersShare = Math.round(
-    (skippedAnswers.length / userAnswers.length) * 100
-  );
+  // Filter out skipped answers (null)
+  const skippedAnswers = userAnswers.filter((answer) => answer === null);
 
   // Calculate percentage of correct answers
-  const correctAnswersShare = Math.round(
-    (correctAnswers.length / userAnswers.length) * 100
+  const correctPercentage = Math.round(
+    (correctAnswers.length / QUESTIONS.length) * 100
   );
-  const wrongAnswersShare = 100 - skippedAnswersShare - correctAnswersShare;
-
-  // XP = number of correct answers
-  const points = correctAnswers.length;
-
-  useEffect(() => {
-    async function sendXP() {
-      try {
-        // Fetch the logged-in user
-        const meRes = await fetch("http://localhost:3000/api/me", {
-          credentials: "include",
-        });
-        const meData = await meRes.json();
-        // Ensure user exists
-        if (!meData || !meData.user) return;
-        // object with multiple fields
-        const userId = meData.user.id;
-
-        // Send XP to backend
-        await fetch("http://localhost:3000/api/earn-points", {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId,
-            points,
-          }),
-        });
-
-        console.log("XP awarded:", points);
-
-        // Unlock Level 3
-        if (setCurrentLevel) setCurrentLevel(3);
-      } catch (err) {
-        console.error("Error adding XP:", err);
-      }
-    }
-
-    sendXP();
-  }, [points, setCurrentLevel]);
 
   return (
     <div id="summary">
@@ -68,39 +23,44 @@ function Summary({ userAnswers, setCurrentLevel }) {
 
       <div id="summary-stats">
         <p>
-          <span className="number">{skippedAnswersShare}%</span>
-          <span className="text">skipped</span>
+          <span className="number">{correctPercentage}%</span>
+          <span className="text">Correct</span>
         </p>
         <p>
-          <span className="number">{correctAnswersShare}%</span>
-          <span className="text">Correctly</span>
+          <span className="number">{skippedAnswers.length}</span>
+          <span className="text">Skipped</span>
         </p>
         <p>
-          <span className="number">{wrongAnswersShare}%</span>
-          <span className="text">Incorrectly</span>
+          <span className="number">
+            {QUESTIONS.length - correctAnswers.length - skippedAnswers.length}
+          </span>
+          <span className="text">Incorrect</span>
         </p>
       </div>
+
       <ol>
         {userAnswers.map((answer, index) => {
           let cssClass = "user-answer";
-
-          if (answer === null) {
-            cssClass += " skipped";
-          } else if (answer === QUESTIONS[index].answers[0]) {
+          if (answer === null) cssClass += " skipped";
+          else if (answer === QUESTIONS[index].answers[0])
             cssClass += " correct";
-          } else {
-            cssClass += " wrong";
-          }
+          else cssClass += " wrong";
 
           return (
             <li key={index}>
-              <h3>{index + 1}</h3>
+              <h3>Q{index + 1}</h3>
               <p className="question">{QUESTIONS[index].text}</p>
               <p className={cssClass}>{answer ?? "Skipped"}</p>
             </li>
           );
         })}
       </ol>
+
+      <p className="status-message">
+        {correctPercentage >= 70
+          ? "✅ You passed and can move on to Level 3!"
+          : "⚠️ You need at least 70% correct to unlock Level 3"}
+      </p>
 
       <button onClick={() => navigate("/play")}>⬅ Back to Escape Room</button>
     </div>

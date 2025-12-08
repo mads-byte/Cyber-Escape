@@ -1,190 +1,170 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import SingleCard from "../components/SingleCard.jsx";
 import "../styles/Level3.css";
+import { useContext, useRef } from "react";
+// import { AuthContext } from "../context/AuthContext";
 
-const scenarios = [
-  {
-    id: 1,
-    title: "Always-True Login",
-    text: "Username: admin  Password: ' OR 1=1 --",
-    isInjection: true,
-    explanation:
-      "This uses OR 1=1 to force the WHERE clause to always be true and the comment (--) to ignore the rest of the query.",
-  },
-  {
-    id: 2,
-    title: "Normal Login Attempt",
-    text: "Username: jason.smith  Password: Winter!2025",
-    isInjection: false,
-    explanation:
-      "This looks like a normal username and password with no SQL operators or comment characters.",
-  },
-  {
-    id: 3,
-    title: "Sneaky UNION Attack",
-    text: "Email: test@example.com' UNION SELECT card_number, cvv FROM payments --",
-    isInjection: true,
-    explanation:
-      "UNION SELECT is being used to pull data from another table (payments) and piggyback on the original query.",
-  },
-  {
-    id: 4,
-    title: "Forgot Password Request",
-    text: "Email: alex.williams@example.com",
-    isInjection: false,
-    explanation:
-      "A standard email address alone is not enough to inject SQL into a properly built query.",
-  },
-  {
-    id: 5,
-    title: "Comment Cut-Off",
-    text: "Username: admin'--  Password: (anything)",
-    isInjection: true,
-    explanation:
-      "The single quote closes the string and the comment (--) cuts off the rest of the WHERE clause.",
-  },
-  {
-    id: 6,
-    title: "Numeric ID Lookup",
-    text: "Account ID: 10492",
-    isInjection: false,
-    explanation:
-      "A simple numeric ID value is normal as long as the query uses parameterized statements.",
-  },
-];
+function Level3({ setCurrentLevel }) {
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const res = await fetch("http://localhost:3000/api/me", {
+          method: "GET",
+          credentials: "include",
+        });
 
-function Level3({ currentLevel }) {
-  if (currentLevel < 3) {
-    return <Navigate to="/play" replace />;
-  }
+        if (!res.ok) {
+          throw new Error(`Failed to fetch admin data`);
+        }
+
+        const data = await res.json();
+        setUserData(data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch admin data");
+      }
+    }
+
+    fetchUserData();
+  }, []);
 
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState({});
-  const [showResults, setShowResults] = useState(false);
 
-  const handleAnswer = (id, choice) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [id]: choice,
-    }));
-    setShowResults(false);
+  const handleFinish = () => {
+    setCurrentLevel(3);
+    navigate("/play");
   };
 
-  const total = scenarios.length;
-  const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount === total;
+  const cardData = [
+    {
+      text: "Hi, your paycheck couldn't be processed this cycle. Please log in here immediately to confirm your employee information: http://company-payroll-verify.com/update Failure to act within 12 hours will delay your payment.",
+      pairID: 1,
+      matched: false,
+    },
+    {
+      text: "We attempted delivery today but couldn't reach you. Please schedule redelivery through the link below. (USPS Official Reminder) usps-delivery-help.net/reschedule",
+      pairID: 2,
+      matched: false,
+    },
+    {
+      text: "Hey! Since the holidays are approaching, the company has decided to give $200-$400 Apple Gift cards to selected employees! You will receive a call to confirm that you have received the correct card. — The CEO",
+      pairID: 3,
+      matched: false,
+    },
+    {
+      text: "We detected unusual activity on your debit card ending in 8294. If this wasn't you, reply with your full name, social security number, and ZIP code to verify your identity.",
+      pairID: 4,
+      matched: false,
+    },
+    {
+      text: "Hello! Attached is your new benefits packet for 2025. This message is from HR. Let us know if you have any trouble opening it.",
+      pairID: 5,
+      matched: false,
+    },
+    {
+      text: "Hey, you! This is your professor from college. Here is the required syllabus and material needed file. Please make sure to complete those by tonight to avoid withdrawal from class. Attachment: download.file.Signsyllabus _and_dowloadfile _TODAY.pdf",
+      pairID: 6,
+      matched: false,
+    },
+    { text: "Phishing Scam", pairID: 1, matched: false, subject: "topic" },
+    { text: "Official Website", pairID: 2, matched: false, subject: "topic" },
+    { text: "Gift Card Fraud", pairID: 3, matched: false, subject: "topic" },
+    { text: "Bank Alert", pairID: 4, matched: false, subject: "topic" },
+    { text: "Legitimate Email", pairID: 5, matched: false, subject: "topic" },
+    {
+      text: "Drive-by Download Attack",
+      subject: "topic",
+      pairID: 6,
+      matched: false,
+    },
+  ];
 
-  const correctCount = scenarios.filter((scenario) => {
-    const userAnswer = answers[scenario.id];
-    if (!userAnswer) return false;
-    const correctAnswer = scenario.isInjection ? "injection" : "safe";
-    return userAnswer === correctAnswer;
-  }).length;
+  const [cards, setCards] = useState([]);
+  const [turns, setTurns] = useState(0);
+  const [choiceOne, setChoiceOne] = useState(null);
+  const [choiceTwo, setChoiceTwo] = useState(null);
+  const [disabled, setDisabled] = useState(false);
+
+  // shuffle cards
+  const shuffleCards = () => {
+    const shuffledCards = [...cardData]
+      .sort(() => Math.random() - 0.5)
+      .map((card) => ({ ...card, id: Math.random() }));
+
+    setCards(shuffledCards);
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setTurns(0);
+  };
+
+  // handle a choice
+  const handleChoice = (card) => {
+    choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
+  };
+
+  // compare 2 selected cards for a match
+  useEffect(() => {
+    if (choiceOne && choiceTwo) {
+      setDisabled(true);
+
+      if (choiceOne.pairID === choiceTwo.pairID) {
+        setCards((prevCards) => {
+          return prevCards.map((card) => {
+            if (card.pairID === choiceOne.pairID) {
+              return { ...card, matched: true };
+            } else {
+              return card;
+            }
+          });
+        });
+        resetTurn();
+      } else {
+        setTimeout(() => resetTurn(), 1000);
+      }
+    }
+  }, [choiceOne, choiceTwo]);
+
+  // check if game is finished
+  // useEffect(() => {
+  //   if (cards.length > 0 && cards.every((card) => card.matched)) {
+  //     return handleFinish();
+  //   }
+  // }, [cards]);
+
+  useEffect(() => {
+    if (cards.length > 0 && cards.every((card) => card.matched)) {
+      (async () => {
+        await handleFinish();
+      })();
+    }
+  }, [cards]);
+
+  // reset choices & increase turn
+  const resetTurn = () => {
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setTurns((prev) => prev + 1);
+    setDisabled(false);
+  };
 
   return (
-    <div className="level-page-container">
-      <header className="level-header">
-        <h1 className="level-title">Level 3: SQL Injection Defense</h1>
-        <p className="level-subtitle">
-          An attacker is trying to break into the database. For each scenario,
-          decide whether the input is <strong>Safe</strong> or an{" "}
-          <strong>SQL Injection</strong>. Classify them all to lock down the
-          system.
-        </p>
-      </header>
+    <div className="MatchGame">
+      <h1>Level 3: Memory Match</h1>
+      <button onClick={shuffleCards}>New Game</button>
 
-      <section className="cards-grid level3-grid">
-        {scenarios.map((scenario) => {
-          const userAnswer = answers[scenario.id];
-          const correctAnswer = scenario.isInjection ? "injection" : "safe";
-          const isCorrect = showResults && userAnswer === correctAnswer;
-
-          return (
-            <div
-              key={scenario.id}
-              className={`level-card ${
-                showResults
-                  ? isCorrect
-                    ? "card-correct"
-                    : "card-incorrect"
-                  : ""
-              }`}
-            >
-              <h2 className="level-card-title">{scenario.title}</h2>
-              <p className="level-card-text">{scenario.text}</p>
-
-              <div className="level-card-buttons">
-                <button
-                  type="button"
-                  className={`choice-button ${
-                    userAnswer === "safe" ? "choice-selected" : ""
-                  }`}
-                  onClick={() => handleAnswer(scenario.id, "safe")}
-                >
-                  Safe Input
-                </button>
-                <button
-                  type="button"
-                  className={`choice-button danger ${
-                    userAnswer === "injection" ? "choice-selected" : ""
-                  }`}
-                  onClick={() => handleAnswer(scenario.id, "injection")}
-                >
-                  SQL Injection
-                </button>
-              </div>
-
-              {showResults && (
-                <p className="level-card-explanation">
-                  {isCorrect ? "✅ Correct: " : "⚠️ Not quite: "}
-                  {scenario.explanation}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </section>
-
-      <section className="level-controls">
-        <button
-          type="button"
-          className="primary-button"
-          disabled={!allAnswered}
-          onClick={() => setShowResults(true)}
-        >
-          {allAnswered ? "Check My Answers" : "Classify All Inputs First"}
-        </button>
-
-        {showResults && (
-          <div className="results-panel">
-            <h2>
-              You got {correctCount} / {total} correct
-            </h2>
-            <p>
-              Each correctly labeled injection is one more door closed to the
-              attacker. When you use parameterized queries and validate inputs,
-              these attacks become much harder.
-            </p>
-          </div>
-        )}
-      </section>
-
-      <footer className="level-footer-nav">
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => navigate("/play")}
-        >
-          ⬅ Back to Escape Room
-        </button>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => navigate(0)}
-        >
-          🔁 Replay Level
-        </button>
-      </footer>
+      <div className="card-grid">
+        {cards.map((card) => (
+          <SingleCard
+            key={card.id}
+            card={card}
+            handleChoice={handleChoice}
+            flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
+          />
+        ))}
+      </div>
     </div>
   );
 }
