@@ -1,12 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useCallback } from "react";
-
+import { useEffect, useState, useCallback } from "react";
+import { Navigate } from "react-router-dom";
 import QUESTIONS from "../questions.js";
 import Question from "../components/Question.jsx";
 import Summary from "../components/Summary.jsx";
 import "../styles/Level2.css";
 
-function Level2() {
+function Level2({ currentLevel, setCurrentLevel }) {
   const [userAnswers, setUserAnswers] = useState([]);
 
   const activeQuestionIndex = userAnswers.length;
@@ -26,8 +25,21 @@ function Level2() {
     [handleSelectAnswer]
   );
 
+  // Unlock Level 3 when quiz is complete
+  useEffect(() => {
+    if (quizIsComplete && currentLevel < 3) {
+      setCurrentLevel(3);
+    }
+  }, [quizIsComplete, currentLevel, setCurrentLevel]);
+
+  if (currentLevel < 2) {
+    return <Navigate to="/play" replace />;
+  }
+
   if (quizIsComplete) {
-    return <Summary userAnswers={userAnswers} />;
+    return (
+      <Summary userAnswers={userAnswers} setCurrentLevel={setCurrentLevel} />
+    );
   }
 
   return (

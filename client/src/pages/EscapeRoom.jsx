@@ -9,6 +9,7 @@ import securityImage from "/src/assets/security.jpg";
 function EscapeRoom({ currentLevel, setCurrentLevel }) {
   const navigate = useNavigate();
 
+  // Assign the rooms and which level is required to unlock
   const rooms = [
     {
       title: "Phishing Email Simulator",
@@ -17,7 +18,7 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
         "Analyze emails and decide whether each message is legitimate or a sneaky phishing attempt. Match them to the right category and uncover the truth!",
       greyBoxContent: "Level 1 | Beginner | 3 minutes",
       route: "/level1",
-      level: 1,
+      requiredLevel: 1,
     },
     {
       title: "Device Security Practices",
@@ -26,7 +27,7 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
         "Learn to identify unsafe device habits and pick up practical techniques for protecting your data and privacy.",
       greyBoxContent: "Level 2 | Intermediate | 5 minutes",
       route: "/level2",
-      level: 2,
+      requiredLevel: 2,
     },
     {
       title: "SQL Injection",
@@ -35,13 +36,13 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
         "Explore how SQL injection works by testing vulnerable input fields and discovering how attackers manipulate databases.",
       greyBoxContent: "Level 3 | Advanced | 7 minutes",
       route: "/level3",
-      level: 3,
+      requiredLevel: 3,
     },
   ];
 
   const handlePlayClick = (room) => {
-    if (room.level > currentLevel) return;
-    navigate(room.route);
+    const unlocked = currentLevel >= room.requiredLevel;
+    if (unlocked) navigate(room.route);
   };
 
   return (
@@ -49,11 +50,12 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
       <h1 className="page-title">Online Escape Rooms</h1>
 
       {rooms.map((room, index) => {
-        const isLocked = room.level > currentLevel;
+        const unlocked = currentLevel >= room.requiredLevel;
+        const isLocked = !unlocked;
 
         return (
           <section
-            className={`box-container ${isLocked ? "locked" : ""}`}
+            className={`box-container ${isLocked ? "locked" : "unlocked"}`}
             key={index}
           >
             <div className="box-image">

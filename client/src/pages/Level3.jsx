@@ -53,7 +53,11 @@ const scenarios = [
   },
 ];
 
-function Level3() {
+function Level3({ currentLevel }) {
+  if (currentLevel < 3) {
+    return <Navigate to="/play" replace />;
+  }
+
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
@@ -63,7 +67,7 @@ function Level3() {
       ...prev,
       [id]: choice,
     }));
-    setShowResults(false); 
+    setShowResults(false);
   };
 
   const total = scenarios.length;

@@ -7,8 +7,8 @@ function Level1({ setCurrentLevel }) {
   const navigate = useNavigate();
 
   const handleFinish = () => {
-    setCurrentLevel(2);
-    navigate("/level2");
+    setCurrentLevel(2); // <-- unlocks level 2
+    navigate("/play");
   };
 
   const cardData = [
