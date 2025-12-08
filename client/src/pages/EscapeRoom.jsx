@@ -5,10 +5,26 @@ import "../styles/EscapeRoom.css";
 import phishingImage from "/src/assets/phishing.jpg";
 import sqlImage from "/src/assets/sql.jpg";
 import securityImage from "/src/assets/security.jpg";
-import { motion, useInView, useAnimation } from 'framer-motion'
+import { motion, useInView, useAnimation } from "framer-motion";
 
 function EscapeRoom({ currentLevel, setCurrentLevel }) {
   const navigate = useNavigate();
+
+  // Framer Motion animation variants
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  };
 
   // Assign the rooms and which level is required to unlock
   const rooms = [
@@ -48,12 +64,15 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
 
   return (
     <motion.main
+      className="escape-room-page"
       variants={container}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true }}>
-
-      <h1 aria-label="Online Escape Rooms" className="page-title">Online Escape Rooms</h1>
+      viewport={{ once: true }}
+    >
+      <h1 aria-label="Online Escape Rooms" className="page-title">
+        Online Escape Rooms
+      </h1>
 
       {rooms.map((room, index) => {
         const unlocked = currentLevel >= room.requiredLevel;
@@ -65,7 +84,6 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
             key={index}
             variants={item}
           >
-
             <div className="content-container">
               <div className="box-image">
                 <img src={room.image} alt={room.title} />
