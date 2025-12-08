@@ -33,25 +33,10 @@ function Level1({ setCurrentLevel }) {
 
   const navigate = useNavigate();
 
-  async function handleFinish() {
-    let id = userData.id
-    let xppts = 30
-    const API_URL = import.meta.env.VITE_BACKEND_URL;
-    const res = await fetch(`${API_URL}/api/earn-points`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ userId: id, points: xppts }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    if (res.ok) { console.log(data) }
-    setCurrentLevel(2);
-    navigate("/level2");
-    return data;
-  }
-
+  const handleFinish = () => {
+    setCurrentLevel(2); // <-- unlocks level 2
+    navigate("/play");
+  };
 
   const cardData = [
     {

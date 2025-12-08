@@ -22,9 +22,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route
             path="/play"
-            element={<EscapeRoom />}
-            currentLevel={currentLevel}
-            setCurrentLevel={setCurrentLevel}
+            element={
+              <EscapeRoom
+                currentLevel={currentLevel}
+                setCurrentLevel={setCurrentLevel}
+              />
+            }
           />
           <Route path="/signup" element={<Signup />} />
           <Route path="/adminDashboard" element={<AdminDashboard />} />
@@ -32,8 +35,19 @@ function App() {
             path="/level1"
             element={<Level1 setCurrentLevel={setCurrentLevel} />}
           />
-          <Route path="/level2" element={<Level2 />} />
-          <Route path="/level3" element={<Level3 />} />
+          <Route
+            path="/level2"
+            element={
+              <Level2
+                currentLevel={currentLevel}
+                setCurrentLevel={setCurrentLevel}
+              />
+            }
+          />
+          <Route
+            path="/level3"
+            element={<Level3 currentLevel={currentLevel} />}
+          />
         </Routes>
       </main>
       <Footer />
