@@ -29,10 +29,11 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
   // Assign the rooms and which level is required to unlock
   const rooms = [
     {
-      title: "Phishing Email Simulator",
-      image: phishingImage,
+      title: "SQL Injection",
+      image: sqlImage,
       description:
-        "Analyze emails and decide whether each message is legitimate or a sneaky phishing attempt. Match them to the right category and uncover the truth!",
+        "Explore how SQL injection works by testing vulnerable input fields and discovering how attackers manipulate databases.",
+
       greyBoxContent: "Level 1 | Beginner | 3 minutes",
       route: "/level1",
       requiredLevel: 1,
@@ -47,10 +48,10 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
       requiredLevel: 2,
     },
     {
-      title: "SQL Injection",
-      image: sqlImage,
+      title: "Phishing Email Simulator",
+      image: phishingImage,
       description:
-        "Explore how SQL injection works by testing vulnerable input fields and discovering how attackers manipulate databases.",
+        "Analyze emails and decide whether each message is legitimate or a sneaky phishing attempt. Match them to the right category and uncover the truth!",
       greyBoxContent: "Level 3 | Advanced | 7 minutes",
       route: "/level3",
       requiredLevel: 3,

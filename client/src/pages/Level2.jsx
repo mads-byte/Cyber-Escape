@@ -6,11 +6,16 @@ import Summary from "../components/Summary.jsx";
 import "../styles/Level2.css";
 
 function Level2({ currentLevel, setCurrentLevel }) {
+  // Store user's selected answers
   const [userAnswers, setUserAnswers] = useState([]);
 
+  // Determine the current active question index
   const activeQuestionIndex = userAnswers.length;
+
+  // Check if the quiz is complete (all questions answered or skipped)
   const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
+  // Handle user selecting an answer
   const handleSelectAnswer = useCallback(function handleSelectAnswer(
     selectedAnswer
   ) {
@@ -20,26 +25,37 @@ function Level2({ currentLevel, setCurrentLevel }) {
   },
   []);
 
+  // Handle skipping a question
   const handleSkipAnswer = useCallback(
     () => handleSelectAnswer(null),
     [handleSelectAnswer]
   );
 
-  // Unlock Level 3 when quiz is complete
+  // Unlock Level 3 only if quiz is complete AND >=70% correct answers
   useEffect(() => {
-    if (quizIsComplete && currentLevel < 3) {
+    if (!quizIsComplete) return;
+
+    // Count number of correct answers
+    const correctCount = userAnswers.filter(
+      (answer, idx) => answer === QUESTIONS[idx].answers[0]
+    ).length;
+
+    // Calculate percentage of correct answers
+    const correctPercentage = (correctCount / QUESTIONS.length) * 100;
+
+    if (correctPercentage >= 70 && currentLevel < 3) {
       setCurrentLevel(3);
     }
-  }, [quizIsComplete, currentLevel, setCurrentLevel]);
+  }, [quizIsComplete, userAnswers, currentLevel, setCurrentLevel]);
 
+  // Redirect user to escape room main page
   if (currentLevel < 2) {
     return <Navigate to="/play" replace />;
   }
 
+  // If quiz is complete, show the summary component
   if (quizIsComplete) {
-    return (
-      <Summary userAnswers={userAnswers} setCurrentLevel={setCurrentLevel} />
-    );
+    return <Summary userAnswers={userAnswers} />;
   }
 
   return (
