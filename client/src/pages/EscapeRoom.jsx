@@ -60,7 +60,7 @@ function EscapeRoom({ currentLevel, setCurrentLevel }) {
         const isLocked = !unlocked;
 
         return (
-          <section
+          <motion.section
             className={`box-container ${isLocked ? "locked" : "unlocked"}`}
             key={index}
             variants={item}
