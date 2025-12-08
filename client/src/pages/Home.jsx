@@ -5,7 +5,9 @@ import qIcon from '../assets/ask.png';
 import lIcon from '../assets/level.png';
 import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, useAnimation } from 'framer-motion'
-function Home() {
+import { Link } from "react-router-dom";
+
+function Home({user}) {
     const ref = useRef(null);
     const controls = useAnimation();
     const isInView = useInView(ref, { once: true });
@@ -37,7 +39,32 @@ function Home() {
                 <img className="header-img" src={header} alt="header" />
                 <div className='img-overlay'>
                     <h1 className={`fly-header ${animateHeader ? "visible" : ""}`}>Ready to play a game?</h1>
-                    <a className={`hero-btn fly-header ${animateHeader ? "visible" : ""}`} href='/play'> Play Now</a>
+                    {/* <a className={`hero-btn fly-header ${animateHeader ? "visible" : ""}`} href='/play'> Play Now</a> */}
+                    {!user &&(
+                        <Link to="/login" 
+                        className={`hero-btn fly-header ${animateHeader ? "visible" : ""}`}
+                        > Play Now
+                        </Link>
+                    )}
+
+                     {user?.accountType === "user" && (
+                        <Link to="/play"
+                        className={`hero-btn fly-header ${animateHeader ? "visible" : ""}`}
+                        >
+                        Play Now
+                        </Link>
+                    )}
+                    
+
+                    {user?.accountType === "admin" && (
+                        <Link to="/adminDashboard"
+                        className={`hero-btn fly-header ${animateHeader ? "visible" : ""}`}
+                        >
+                        Play Now
+                        </Link>
+                    )}
+                    
+
                 </div>
             </section>
             <section className='spacer'>
