@@ -10,10 +10,11 @@ import Level2 from "./pages/Level2.jsx";
 import Level3 from "./pages/Level3.jsx";
 import Footer from "./components/Footer.jsx";
 import { useState } from "react";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   return (
     <Router>
       <Navbar />
