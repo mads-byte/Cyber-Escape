@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/Login.css"; 
+import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
@@ -18,13 +18,14 @@ export default function Signup() {
   const [message, setMessage] = useState("");
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-//Handles all input changes in form
+  //Handles all input changes in form
   const handleChange = (e) => {
     const { name, value } = e.target;
     //Update formData state
-    setFormData((prev) => ({ ...prev, //keeps old value
-         [name]: value               // update only changed field
-        }));
+    setFormData((prev) => ({
+      ...prev, //keeps old value
+      [name]: value               // update only changed field
+    }));
   };
 
   //validate all form fields before submitting
@@ -53,8 +54,9 @@ export default function Signup() {
     if (!validateForm()) return;
 
     try {
-        //sending form data to backend
-      const res = await fetch("http://localhost:5000/api/signup", {
+      //sending form data to backend
+      const API_URL = import.meta.env.VITE_BACKEND_URL
+      const res = await fetch(`${API_URL}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

@@ -10,7 +10,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchAdminData() {
       try {
-        const res = await fetch("http://localhost:3000/api/me", {
+        const API_URL = import.meta.env.VITE_BACKEND_URL
+        const res = await fetch(`${API_URL}/api/me`, {
           method: "GET",
           credentials: "include",
         });
