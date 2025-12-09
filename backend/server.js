@@ -50,7 +50,7 @@ app.post('/register-user', async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
         const [existingEmail] = await db.query(
-            'SELECT id FROM users WHERE email = ?',
+            'SELECT user_id FROM users WHERE email = ?',
             [email]
         );
         if (existingEmail.length > 0) {
@@ -61,7 +61,7 @@ app.post('/register-user', async (req, res) => {
 
 
         const [teamAdmin] = await db.query(
-            'SELECT id FROM admins WHERE team_code = ?',
+            'SELECT user_id FROM admins WHERE team_code = ?',
             [teamCode]
         );
         if (teamAdmin.length == 0) { //check if team code exists
@@ -71,7 +71,7 @@ app.post('/register-user', async (req, res) => {
         }
 
         const [existingTeammate] = await db.query(
-            'SELECT id FROM users WHERE username = ? AND team_code = ?',
+            'SELECT user_id FROM users WHERE username = ? AND team_code = ?',
             [username, teamCode]
         );
         if (existingTeammate.length > 0) { // check if username already taken in this team
@@ -100,7 +100,7 @@ app.post('/register-admin', async (req, res) => {
             return res.status(400).json({ error: 'username, email, and password are required' });
         }
         const [existingEmail] = await db.query(
-            'SELECT id FROM admins WHERE email = ?',
+            'SELECT user_id FROM admins WHERE email = ?',
             [email]
         );
         if (existingEmail.length > 0) {
@@ -111,14 +111,14 @@ app.post('/register-admin', async (req, res) => {
 
         let team_code = generateCode();
         let [existingCode] = await db.query(
-            'SELECT id FROM admins WHERE team_code = ?',
+            'SELECT user_id FROM admins WHERE team_code = ?',
             [team_code]
         );
 
         while (existingCode.length > 0) {
             team_code = generateCode();
             [existingCode] = await db.query(
-                'SELECT id FROM admins WHERE team_code = ?',
+                'SELECT user_id FROM admins WHERE team_code = ?',
                 [team_code]
             );
         }
@@ -162,7 +162,7 @@ app.post('/user-login', async (req, res, next) => {
 
         req.session.admin = null;
         req.session.user = {
-            id: user[0].id,
+            id: user[0].user_id,
             account_type: 'user',
             username: user[0].username,
         };
@@ -199,7 +199,7 @@ app.post('/admin-login', async (req, res, next) => {
         }
         req.session.user = null;
         req.session.admin = {
-            id: admin[0].id,
+            id: admin[0].user_id,
             account_type: 'admin',
             username: admin[0].username,
         };
@@ -212,7 +212,7 @@ app.post('/admin-login', async (req, res, next) => {
     }
 });
 
-app.put('api/earn-points', async (req, res) => {
+app.put('/api/earn-points', async (req, res) => {
     try {
         if (!req.session.user) {
             return res.status(401).json({ error: 'Unauthorized' });
@@ -223,7 +223,7 @@ app.put('api/earn-points', async (req, res) => {
         }
 
         const [result] = await db.query(
-            'UPDATE users SET experience_points = experience_points + ? WHERE id = ?',
+            'UPDATE users SET exp_points = exp_points + ? WHERE user_id = ?',
             [points, userId]
         );
 
@@ -233,7 +233,7 @@ app.put('api/earn-points', async (req, res) => {
 
         res.json({ message: `+${points} xp` });
     } catch (error) {
-        console.error('Error updating experience points:', error);
+        console.error('Error updating exp points:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -242,17 +242,17 @@ app.get('/api/me', async (req, res) => {
     try {
         if (req.session.user) {
             const [user] = await db.query(
-                'SELECT * FROM users WHERE id = ?',
+                'SELECT * FROM users WHERE user_id = ?',
                 [req.session.user.id]
             )
-            return res.json({ user: user[0].username, email: user[0].email, team_code: user[0].team_code, experience_points: user[0].experience_points });
+            return res.json({ user: user[0].username, email: user[0].email, team_code: user[0].team_code, exp_points: user[0].exp_points });
         } else if (req.session.admin) {
             const [admin] = await db.query(
-                'SELECT * FROM admins WHERE id = ?',
+                'SELECT * FROM admins WHERE user_id = ?',
                 [req.session.admin.id]
             )
             const [teamMembers] = await db.query(
-                'SELECT id, username, email, experience_points FROM users WHERE team_code = ?',
+                'SELECT user_id, username, email, exp_points FROM users WHERE team_code = ?',
                 [admin[0].team_code]
             )
             return res.json({ admin: admin[0].username, email: admin[0].email, team_code: admin[0].team_code, team_members: teamMembers });
@@ -263,7 +263,7 @@ app.get('/api/me', async (req, res) => {
     }
 })
 
-app.post('logout', (req, res) => {
+app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Error during logout:', err);
@@ -279,29 +279,5 @@ app.post('logout', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-//testing database: J: worked?
-// app.get("/db-test", async (req, res) => {
-//   try {
-//     const [rows] = await db.query("SELECT 1 + 1 AS result"); // simple test query
-//     res.json({ success: true, result: rows[0].result });
-//   } catch (err) {
-//     console.error("Database test failed:", err.message);
-//     res.status(500).json({ success: false, error: err.message });
-//   }
-// });
-
-//test2? --- worked!!!
-// app.get("/users-test", async (req, res) => {
-//   try {
-//     const [rows] = await db.query("SELECT * FROM users LIMIT 5");
-//     res.json({ success: true, users: rows });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, error: err.message });
-//   }
-// });
-
 
 

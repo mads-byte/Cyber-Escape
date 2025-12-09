@@ -75,7 +75,7 @@ export default function Login() {
       if (user.accountType === "admin") {
         navigate("/adminDashboard");
       } else {
-        navigate("/escapeRoom");
+        navigate("/play");
       }
     } catch (err) {
       setMessage(err.message);
