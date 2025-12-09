@@ -78,7 +78,7 @@ export default function Login() {
         navigate("/play");
       }
     } catch (err) {
-      setMessage(err.message || "Something went wrong. Try again.");
+      setMessage(err.message);
     }
   };
 
@@ -125,13 +125,11 @@ export default function Login() {
               <div className="login--error">{errors.password}</div>
             )}
           </div>
+
+          <div className="login--buttons">
             <button type="submit" className="btn-login">Login</button>
-            <p className="authswitch">
-                Don't have an account?{"  "}
-                <span className="auth-link" onClick={() => navigate("/signup")}>
-                    Sign up
-                </span>
-            </p>
+            <a href="/signup" className="btn-login">Sign Up</a>
+          </div>
         </div>
       </form>
     </div>

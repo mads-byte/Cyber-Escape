@@ -9,8 +9,8 @@
 
 .login--form {
     background-color: #141028;
-    width: 380px; /* 25%*/
-    height: 60vh;/*474.6px */
+    width: 30%; /*for media query:380px; */
+    height: 60vh;
     padding: 35px 40px;
     border-radius: 25px;
     box-shadow: 0 3px 7px #ae0874;
@@ -21,9 +21,9 @@
     font-family: "GlitchGoblin", sans-serif;
     text-shadow: 2px 2px #ae0874;
     text-align: center;
-    font-size: 60px; 
+    font-size: 65px; /* font-size: 28px; */
     font-weight: bold;
-    color: white; 
+    color: white; /*#5f2eea;*/
     margin-bottom: 20px;
 }
 .login--your-info {
@@ -34,7 +34,7 @@
 .form--group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .form--group label {
@@ -52,6 +52,7 @@
     border-radius: 12px;
     border: 2px solid #e3e3e3;
     outline: none;
+    /* transition: border-color 0.2s; */
     box-shadow: 0 2px 6px #ae0874;
 }
 
@@ -67,40 +68,41 @@
     border-color: #5f2eea;
 }
 
+
+
 .login--error {
     color: #d9534f;
     font-size: 13px;
     margin-top: 5px;
 }
 
-.btn-login {
-  padding: 12px;
-  margin-top: 10px;
-  width: 100%;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  background: #5f2eea;
-  color: white;
-  transition: 0.2s ease;
+
+
+
+.login--buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
 }
 
-.btn-login:hover {
+.btn-login,
+.btn-signup {
+    width: 48%;
+    padding: 12px 0;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: opacity 0.2s ease-in-out;
+    background: #5f2eea;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-login:hover,
+.btn-signup:hover {
     opacity: 0.85;
-}
-
-.authswitch {
-    margin-top: 15px;
-}
-.auth-link {
-    color: #ae0874;
-    font-weight: 800;
-}
-.auth-link:hover {
-    color: #5f2eea;
-
 }
 
 #message {
@@ -110,59 +112,6 @@
     color: #d9534f;
 }
 
-/*mobile*/
-@media (max-width: 480px) {
-
-  .login--form {
-    width: 90%;
-    height: auto; 
-    padding: 25px 20px;
-  }
-
-  .login {
-    font-size: 40px; 
-    margin-bottom: 15px;
-  }
-
-  .login--your-info {
-    margin-top: 15px;
-  }
-
-  .form--group input {
-    font-size: 14px;
-    padding: 10px 12px;
-  }
-
-  .btn-login {
-    padding: 10px;
-    font-size: 15px;
-  }
-
-  .authswitch {
-    font-size: 14px;
-  }
+@media (max-width: 788px) and (min-width: 755px) {
+    
 }
-
-
-@media (max-width: 768px) and (min-width: 481px) {
-
-  .login--form {
-    width: 75%;
-    height: auto;
-    padding: 30px 30px;
-  }
-
-  .login {
-    font-size: 48px;
-  }
-
-  .login--your-info {
-    margin-top: 20px;
-  }
-
-  .form--group input {
-    padding: 12px;
-    font-size: 15px;
-  }
-}
-
